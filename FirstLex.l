@@ -107,7 +107,7 @@ SymDataNode* myFirstNode;
 "/*"         {BEGIN(CommStarSlide);LIST;}
 
 <CommStarSlide>[^*\n]*        LIST;
-<CommStarSlide>"*"+[^*/\n]*   LIST;
+<CommStarSlide>"*"+[^/\n]*   LIST;
 <CommStarSlide>\n             {++linenum;LIST;}
 <CommStarSlide>"*"+"/"        {BEGIN(INITIAL);LIST;}
 
@@ -123,8 +123,10 @@ LIST;
 printf("%d: %s", linenum, buf);
 linenum++;
 buf[0] = 0;
-buf[1] = 0;
 }
+
+
+
 
 [ \t]* {LIST;}
 . {
@@ -135,7 +137,14 @@ exit(-1);
 }
 %%
 
-
+int yywrap(void)        
+{
+LIST;
+printf("%d: %s\n", linenum, buf);
+linenum++;
+buf[0] = 0;
+buf[1] = 0;          
+}
 
 main()
 {
