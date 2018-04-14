@@ -30,8 +30,8 @@ char *CopyString(char *s)
     return copyS; 
 }
 int InsertTable(SymDataNode* myFirstNode, char* s){
-    // int flag = LookupTable(myFirstNode,s);
-    // if(flag<0){}
+    int flag = LookupTable(myFirstNode,s);
+    if(flag<0){
         SymDataNode* lnode = myFirstNode;
         for(int i = 0;lnode->next!=NULL;i++){
             lnode = lnode->next;
@@ -40,7 +40,7 @@ int InsertTable(SymDataNode* myFirstNode, char* s){
         temp->name = CopyString(s);
         temp->next = NULL;
         lnode->next = temp;
-    
+    }
 }
 int DumpTable(SymDataNode* myFirstNode){
     SymDataNode* lnode = myFirstNode->next;//first node don' have data

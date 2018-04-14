@@ -2,9 +2,12 @@
 Digit   [0-9]
 Letter  [a-zA-Z]
 AllLetter [a-zA-Z0-9]
-integer {Digit}
-plain_real {Digit}"."{Digit}
-expreal {Digit}"."{Digit}[Ee][+-]?{Digit}
+
+integer {Digit}+
+fraction 0|[0-9]*[1-9]
+plain_real {Digit}*\.{Digit}
+float {integer}\.{fraction}
+expreal {Digit}*\.{Digit}[Ee][+-]?{Digit}
 real {plainreal}|{expreal}
 
 %x Comm2Slide
@@ -18,6 +21,7 @@ real {plainreal}|{expreal}
 #define LIST strcat(buf,yytext)
 #define token(t) {LIST; printf("<%s>\n",t);}
 #define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,atoi(i));}
+#define tokenFloat(t,i) {LIST; printf("<%s:%f>\n",t,atof(i));}
 #define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s);}
 int linenum = 1;
 char buf[MAX_LINE_LENG];
@@ -93,8 +97,8 @@ SymDataNode* myFirstNode;
 "while" {token("WHILE");}
 
 {Letter}{AllLetter}* {tokenString("id",yytext);InsertTable(myFirstNode,yytext);}
-{integer}+ {tokenInteger("integer",yytext);}
-
+("+"|"-")?{integer} {tokenInteger("integer",yytext);}
+{float} {tokenFloat("float",yytext);}
 "//"  {BEGIN(Comm2Slide);LIST;}
 
 <Comm2Slide>[^\n]*        LIST;
@@ -108,12 +112,13 @@ SymDataNode* myFirstNode;
 
 <CommStarSlide>[^*\n]*        LIST;
 <CommStarSlide>"*"+[^/\n]*   LIST;
-<CommStarSlide>\n             {++linenum;LIST;}
+<CommStarSlide>\n             {LIST;printf("%d: %s", linenum, buf);linenum++;buf[0] = 0;}
 <CommStarSlide>"*"+"/"        {BEGIN(INITIAL);LIST;}
 
 "\"" {BEGIN(StringMode);}
 
 <StringMode>[^"\n]*        {LIST;strcat(strBuf,yytext);}
+<StringMode>"\"\""        {LIST;strcat(strBuf,yytext);}
 <StringMode>\n             ++linenum;
 <StringMode>"\""       {BEGIN(INITIAL);tokenString("string",strBuf);}
 
