@@ -63,7 +63,6 @@ SymDataNode* myFirstNode;
 "-=" {token("'-='");}
 "*=" {token("'*='");}
 "/=" {token("'/='");}
-"->" {token("'->'");}
 
 "if" {token("IF");}
 "bool" {token("BOOL");}
@@ -118,11 +117,11 @@ SymDataNode* myFirstNode;
 <CommStarSlide>\n             {LIST;printf("%d: %s", linenum, buf);linenum++;buf[0] = 0;}
 <CommStarSlide>"*"+"/"        {BEGIN(INITIAL);LIST;}
 
-"\"" {BEGIN(StringMode);}
+"\"" {BEGIN(StringMode);LIST;}
 
 <StringMode>[^"\n]*        {LIST;strcat(strBuf,yytext);}
 <StringMode>"\"\""        {LIST;strcat(strBuf,yytext);}
-<StringMode>\n             ++linenum;
+<StringMode>\n             {LIST;strcat(strBuf,yytext);printf("%d: %s", linenum, buf);buf[0] = 0;++linenum;}
 <StringMode>"\""       {BEGIN(INITIAL);tokenString("string",strBuf);}
 
 

@@ -31,16 +31,19 @@ char *CopyString(char *s)
 }
 int InsertTable(SymDataNode* myFirstNode, char* s){
     int flag = LookupTable(myFirstNode,s);
+    int i;
     if(flag<0){
         SymDataNode* lnode = myFirstNode;
-        for(int i = 0;lnode->next!=NULL;i++){
+        for(i = -1;lnode->next!=NULL;i++){
             lnode = lnode->next;
         }
         SymDataNode* temp = (SymDataNode*) malloc(sizeof(SymDataNode));
         temp->name = CopyString(s);
         temp->next = NULL;
         lnode->next = temp;
+        return i+1; 
     }
+    return flag;
 }
 int DumpTable(SymDataNode* myFirstNode){
     SymDataNode* lnode = myFirstNode->next;//first node don' have data
