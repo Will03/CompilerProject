@@ -6,8 +6,8 @@ AllLetter [a-zA-Z0-9]
 integer {Digit}+
 fraction 0|[0-9]*[1-9]
 plain_real {Digit}*\.{Digit}
-float {integer}\.{fraction}
-expreal {Digit}*\.{Digit}[Ee][+-]?{Digit}
+float [+-]?{integer}\.{fraction}
+expreal [1-9]\.{integer}[eE][+-]{integer}
 real {plainreal}|{expreal}
 
 %x Comm2Slide
@@ -22,6 +22,7 @@ real {plainreal}|{expreal}
 #define token(t) {LIST; printf("<%s>\n",t);}
 #define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,atoi(i));}
 #define tokenFloat(t,i) {LIST; printf("<%s:%f>\n",t,atof(i));}
+#define tokenExponent(t,i) {LIST; printf("<%s:%g>\n",t,atof(i));}
 #define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s);}
 int linenum = 1;
 char buf[MAX_LINE_LENG];
@@ -30,39 +31,39 @@ SymDataNode* myFirstNode;
 %}
 
 %%
-"(" {token("(");}
-")" {token(")");}
-"[" {token("[");}
-"]" {token("]");}
-"{" {token("{");}
-"}" {token("}");}
-"," {token(",");}
-":" {token(":");}
-";" {token(";");}
+"(" {token("'('");}
+")" {token("')'");}
+"[" {token("'['");}
+"]" {token("']'");}
+"{" {token("'{'");}
+"}" {token("'}'");}
+"," {token("','");}
+":" {token("':'");}
+";" {token("';'");}
 
 
-"+" {token("+");}
-"-" {token("-");}
-"*" {token("*");}
-"/" {token("/");}
-"%" {token("%");}
-"<" {token("<");}
-">" {token(">");}
-"!" {token("!");}
-"=" {token("=");}
-"<=" {token("<=");}
-">=" {token(">=");}
-"==" {token("==");}
-"!=" {token("!=");}
-"&&" {token("&&");}
-"||" {token("||");}
-"++" {token("++");}
-"--" {token("--");}
-"+=" {token("+=");}
-"-=" {token("-=");}
-"*=" {token("*=");}
-"/=" {token("/=");}
-"->" {token("->");}
+"+" {token("'+'");}
+"-" {token("'-'");}
+"*" {token("'*'");}
+"/" {token("'/'");}
+"%" {token("'%'");}
+"<" {token("'<'");}
+">" {token("'>'");}
+"!" {token("'!'");}
+"=" {token("'='");}
+"<=" {token("'<='");}
+">=" {token("'>='");}
+"==" {token("'=='");}
+"!=" {token("'!='");}
+"&&" {token("'&&'");}
+"||" {token("'||'");}
+"++" {token("'++'");}
+"--" {token("'--'");}
+"+=" {token("'+='");}
+"-=" {token("'-='");}
+"*=" {token("'*='");}
+"/=" {token("'/='");}
+"->" {token("'->'");}
 
 "if" {token("IF");}
 "bool" {token("BOOL");}
@@ -98,7 +99,9 @@ SymDataNode* myFirstNode;
 
 {Letter}{AllLetter}* {tokenString("id",yytext);InsertTable(myFirstNode,yytext);}
 ("+"|"-")?{integer} {tokenInteger("integer",yytext);}
+{expreal} {tokenExponent("exponent",yytext);}
 {float} {tokenFloat("float",yytext);}
+
 "//"  {BEGIN(Comm2Slide);LIST;}
 
 <Comm2Slide>[^\n]*        LIST;
