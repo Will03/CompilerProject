@@ -595,17 +595,19 @@ char *yytext;
 
 #line 19 "FirstLex.l"
 
+#include "y.tab.h"
 #include"MySymbolTable.h"
 #define MAX_LINE_LENG 256
 #define LIST strcat(buf,yytext)
-#define token(t) {LIST; printf("<%s>\n",t);}
-#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,atoi(i));}
-#define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s);}
+#define token(t) {LIST; printf("<'%s'>\n",yytext);return t;}
+#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,atoi(i));yylval.Data.val = atoi(i); yylval.Data.val_type = VAL_INT;return(NUMBER);}
+#define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s); yylval.Data.name = s; yylval.Data.val_type = VAL_STR; return(STR);}
+enum Type_enum{VAL_INT = 1, VAL_BOOL, VAL_STR, VAL_REAL};
 int linenum = 1;
 char buf[MAX_LINE_LENG];
 char strBuf[MAX_LINE_LENG];
 SymDataNode* myFirstNode; 
-#line 609 "lex.yy.c"
+#line 611 "lex.yy.c"
 
 #define INITIAL 0
 #define Comm2Slide 1
@@ -826,9 +828,9 @@ YY_DECL
 		}
 
 	{
-#line 32 "FirstLex.l"
+#line 34 "FirstLex.l"
 
-#line 832 "lex.yy.c"
+#line 834 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -887,343 +889,356 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 33 "FirstLex.l"
-{token("'('");}
+#line 35 "FirstLex.l"
+{token('(');}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 34 "FirstLex.l"
-{token("')'");}
+#line 36 "FirstLex.l"
+{token(')');}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "FirstLex.l"
-{token("'['");}
+#line 37 "FirstLex.l"
+{token('[');}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 36 "FirstLex.l"
-{token("']'");}
+#line 38 "FirstLex.l"
+{token(']');}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 37 "FirstLex.l"
-{token("'{'");}
+#line 39 "FirstLex.l"
+{token('{');}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 38 "FirstLex.l"
-{token("'}'");}
+#line 40 "FirstLex.l"
+{token('}');}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 39 "FirstLex.l"
-{token("','");}
+#line 41 "FirstLex.l"
+{token(',');}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 40 "FirstLex.l"
-{token("':'");}
+#line 42 "FirstLex.l"
+{token(':');}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 41 "FirstLex.l"
-{token("';'");}
+#line 43 "FirstLex.l"
+{token(';');}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 44 "FirstLex.l"
-{token("'+'");}
+#line 46 "FirstLex.l"
+{token('+');}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 45 "FirstLex.l"
-{token("'-'");}
+#line 47 "FirstLex.l"
+{token('-');}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 46 "FirstLex.l"
-{token("'*'");}
+#line 48 "FirstLex.l"
+{token('*');}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 47 "FirstLex.l"
-{token("'/'");}
+#line 49 "FirstLex.l"
+{token('/');}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 48 "FirstLex.l"
-{token("'%'");}
+#line 50 "FirstLex.l"
+{token('%');}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 49 "FirstLex.l"
-{token("'<'");}
+#line 51 "FirstLex.l"
+{token('<');}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 50 "FirstLex.l"
-{token("'>'");}
+#line 52 "FirstLex.l"
+{token('>');}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 51 "FirstLex.l"
-{token("'!'");}
+#line 53 "FirstLex.l"
+{token('!');}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 52 "FirstLex.l"
-{token("'='");}
+#line 54 "FirstLex.l"
+{token('=');}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 53 "FirstLex.l"
-{token("'<='");}
+#line 55 "FirstLex.l"
+{token(LESS_EQUAL);}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 54 "FirstLex.l"
-{token("'>='");}
+#line 56 "FirstLex.l"
+{token(GREAT_EQUAL);}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 55 "FirstLex.l"
-{token("'=='");}
+#line 57 "FirstLex.l"
+{token(EQUAL);}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 56 "FirstLex.l"
-{token("'!='");}
+#line 58 "FirstLex.l"
+{token(NOT_EQUAL);}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 57 "FirstLex.l"
-{token("'&&'");}
+#line 59 "FirstLex.l"
+{token(AND_DOUBLE);}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 58 "FirstLex.l"
-{token("'||'");}
+#line 60 "FirstLex.l"
+{token(OR_DOUBLE);}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 59 "FirstLex.l"
-{token("'++'");}
+#line 61 "FirstLex.l"
+{token(ADD_DOUBLE);}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 60 "FirstLex.l"
-{token("'--'");}
+#line 62 "FirstLex.l"
+{token(SUB_DOUBLE);}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 61 "FirstLex.l"
-{token("'+='");}
+#line 63 "FirstLex.l"
+{token(ADD_EQUAL);}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 62 "FirstLex.l"
-{token("'-='");}
+#line 64 "FirstLex.l"
+{token(SUB_EQUAL);}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 63 "FirstLex.l"
-{token("'*='");}
+#line 65 "FirstLex.l"
+{token(MUL_EQUAL);}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 64 "FirstLex.l"
-{token("'/='");}
+#line 66 "FirstLex.l"
+{token(DIV_EQUAL);}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 66 "FirstLex.l"
-{token("IF");}
+#line 68 "FirstLex.l"
+{token(IF);}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 67 "FirstLex.l"
-{token("BOOL");}
+#line 69 "FirstLex.l"
+{token(BOOL);}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 68 "FirstLex.l"
-{token("BREAK");}
+#line 70 "FirstLex.l"
+{token(BREAK);}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 69 "FirstLex.l"
-{token("CHAR");}
+#line 71 "FirstLex.l"
+{token(CHAR);}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 70 "FirstLex.l"
-{token("CONTINUE");}
+#line 72 "FirstLex.l"
+{token(CONTINUE);}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 71 "FirstLex.l"
-{token("DO");}
+#line 73 "FirstLex.l"
+{token(DO);}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 72 "FirstLex.l"
-{token("ELSE");}
+#line 74 "FirstLex.l"
+{token(ELSE);}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 73 "FirstLex.l"
-{token("ENUM");}
+#line 75 "FirstLex.l"
+{token(ENUM);}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 74 "FirstLex.l"
-{token("EXTERN");}
+#line 76 "FirstLex.l"
+{token(EXTERN);}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 75 "FirstLex.l"
-{token("FALSE");}
+#line 77 "FirstLex.l"
+{token(FALSE);}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 76 "FirstLex.l"
-{token("FLOAT");}
+#line 78 "FirstLex.l"
+{token(FLOAT);}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 77 "FirstLex.l"
-{token("FOR");}
+#line 79 "FirstLex.l"
+{token(FOR);}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 78 "FirstLex.l"
-{token("FN");}
+#line 80 "FirstLex.l"
+{token(FN);}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 79 "FirstLex.l"
-{token("IN");}
+#line 81 "FirstLex.l"
+{token(IN);}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 80 "FirstLex.l"
-{token("INT");}
+#line 82 "FirstLex.l"
+{token(INT);}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 81 "FirstLex.l"
-{token("LET");}
+#line 83 "FirstLex.l"
+{token(LET);}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 82 "FirstLex.l"
-{token("LOOP");}
+#line 84 "FirstLex.l"
+{token(LOOP);}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 83 "FirstLex.l"
-{token("MATCH");}
+#line 85 "FirstLex.l"
+{token(MATCH);}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 84 "FirstLex.l"
-{token("MUT");}
+#line 86 "FirstLex.l"
+{token(MUT);}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 85 "FirstLex.l"
-{token("PRINT");}
+#line 87 "FirstLex.l"
+{token(PRINT);}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 86 "FirstLex.l"
-{token("PRINTLN");}
+#line 88 "FirstLex.l"
+{token(PRINTLN);}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 87 "FirstLex.l"
-{token("PUB");}
+#line 89 "FirstLex.l"
+{token(PUB);}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 88 "FirstLex.l"
-{token("RETURN");}
+#line 90 "FirstLex.l"
+{token(RETURN);}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 89 "FirstLex.l"
-{token("SELF");}
+#line 91 "FirstLex.l"
+{token(SELF);}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 90 "FirstLex.l"
-{token("STATIC");}
+#line 92 "FirstLex.l"
+{token(STATIC);}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 91 "FirstLex.l"
-{token("STR");}
+#line 93 "FirstLex.l"
+{token(STR);}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 92 "FirstLex.l"
-{token("STRUCT");}
+#line 94 "FirstLex.l"
+{token(STRUCT);}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 93 "FirstLex.l"
-{token("TRUE");}
+#line 95 "FirstLex.l"
+{token(TRUE);}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 94 "FirstLex.l"
-{token("USE");}
+#line 96 "FirstLex.l"
+{token(USE);}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 95 "FirstLex.l"
-{token("WHERE");}
+#line 97 "FirstLex.l"
+{token(WHERE);}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 96 "FirstLex.l"
-{token("WHILE");}
+#line 98 "FirstLex.l"
+{token(WHILE);}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 98 "FirstLex.l"
-{tokenString("id",yytext);InsertTable(myFirstNode,yytext);}
+#line 100 "FirstLex.l"
+{
+	yylval.Data.name = strdup(yytext);
+	yylval.Data.val_type = VAL_STR;
+	printf("<%s:%s>\n", "ID", yytext);
+	token(ID);
+}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 99 "FirstLex.l"
+#line 107 "FirstLex.l"
 {tokenInteger("integer",yytext);}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 100 "FirstLex.l"
-{tokenString("real",yytext);}
+#line 109 "FirstLex.l"
+{
+    yylval.Data.name = strdup(yytext);
+	yylval.Data.val_type = VAL_REAL;
+	token(REAL_NUMBER);
+    }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 101 "FirstLex.l"
-{tokenString("real",yytext);}
+#line 115 "FirstLex.l"
+{
+    yylval.Data.name = strdup(yytext);
+	yylval.Data.val_type = VAL_REAL;
+	token(REAL_NUMBER);
+    }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 103 "FirstLex.l"
+#line 121 "FirstLex.l"
 {BEGIN(Comm2Slide);LIST;}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 105 "FirstLex.l"
+#line 123 "FirstLex.l"
 LIST;
 	YY_BREAK
 case 68:
 /* rule 68 can match eol */
 YY_RULE_SETUP
-#line 106 "FirstLex.l"
+#line 124 "FirstLex.l"
 {BEGIN(INITIAL);LIST;
                             printf("%d: %s", linenum, buf);
                             linenum++;
@@ -1231,60 +1246,60 @@ YY_RULE_SETUP
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 112 "FirstLex.l"
+#line 130 "FirstLex.l"
 {BEGIN(CommStarSlide);LIST;}
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 114 "FirstLex.l"
+#line 132 "FirstLex.l"
 LIST;
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 115 "FirstLex.l"
+#line 133 "FirstLex.l"
 LIST;
 	YY_BREAK
 case 72:
 /* rule 72 can match eol */
 YY_RULE_SETUP
-#line 116 "FirstLex.l"
+#line 134 "FirstLex.l"
 {LIST;printf("%d: %s", linenum, buf);linenum++;buf[0] = 0;}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 117 "FirstLex.l"
+#line 135 "FirstLex.l"
 {BEGIN(INITIAL);LIST;}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 119 "FirstLex.l"
+#line 137 "FirstLex.l"
 {BEGIN(StringMode);LIST;}
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 121 "FirstLex.l"
+#line 139 "FirstLex.l"
 {LIST;strcat(strBuf,yytext);}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 122 "FirstLex.l"
+#line 140 "FirstLex.l"
 {LIST;strcat(strBuf,yytext);}
 	YY_BREAK
 case 77:
 /* rule 77 can match eol */
 YY_RULE_SETUP
-#line 123 "FirstLex.l"
+#line 141 "FirstLex.l"
 {LIST;strcat(strBuf,yytext);printf("%d: %s", linenum, buf);buf[0] = 0;++linenum;}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 124 "FirstLex.l"
+#line 142 "FirstLex.l"
 {BEGIN(INITIAL);tokenString("string",strBuf);strBuf[0] = 0;}
 	YY_BREAK
 case 79:
 /* rule 79 can match eol */
 YY_RULE_SETUP
-#line 127 "FirstLex.l"
+#line 145 "FirstLex.l"
 {
 LIST;
 printf("%d: %s", linenum, buf);
@@ -1294,12 +1309,12 @@ buf[0] = 0;
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 137 "FirstLex.l"
+#line 155 "FirstLex.l"
 {LIST;}
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 138 "FirstLex.l"
+#line 156 "FirstLex.l"
 {
 LIST;
 printf("%d:%s\n", linenum, buf);
@@ -1309,10 +1324,10 @@ exit(-1);
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 144 "FirstLex.l"
+#line 162 "FirstLex.l"
 ECHO;
 	YY_BREAK
-#line 1316 "lex.yy.c"
+#line 1331 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(Comm2Slide):
 case YY_STATE_EOF(CommStarSlide):
@@ -2316,7 +2331,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 144 "FirstLex.l"
+#line 162 "FirstLex.l"
 
 
 
@@ -2329,9 +2344,9 @@ buf[0] = 0;
 buf[1] = 0;          
 }
 
-main()
-{
-    myFirstNode = CreateTable();
-    yylex();
-    DumpTable(myFirstNode);
-}
+//main()
+//{
+//   myFirstNode = CreateTable();
+//    yylex();
+//    DumpTable(myFirstNode);
+//}
