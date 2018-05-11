@@ -56,42 +56,41 @@ extern int yydebug;
     ENUM = 266,
     EXTERN = 267,
     FALSE = 268,
-    FLOAT = 269,
-    FOR = 270,
-    FN = 271,
-    IN = 272,
-    INT = 273,
-    LET = 274,
-    LOOP = 275,
-    MATCH = 276,
-    MUT = 277,
-    PRINT = 278,
-    PRINTLN = 279,
-    PUB = 280,
-    RETURN = 281,
-    SELF = 282,
-    STATIC = 283,
-    STRUCT = 284,
-    TRUE = 285,
-    USE = 286,
-    WHERE = 287,
-    WHILE = 288,
-    LESS_EQUAL = 289,
-    GREAT_EQUAL = 290,
-    EQUAL = 291,
-    NOT_EQUAL = 292,
-    AND_DOUBLE = 293,
-    OR_DOUBLE = 294,
-    ADD_DOUBLE = 295,
-    SUB_DOUBLE = 296,
-    ADD_EQUAL = 297,
-    SUB_EQUAL = 298,
-    MUL_EQUAL = 299,
-    DIV_EQUAL = 300,
-    NUMBER = 301,
-    STR = 302,
-    ID = 303,
-    REAL_NUMBER = 304
+    FOR = 269,
+    FN = 270,
+    IN = 271,
+    LET = 272,
+    LOOP = 273,
+    MATCH = 274,
+    MUT = 275,
+    PRINT = 276,
+    PRINTLN = 277,
+    PUB = 278,
+    RETURN = 279,
+    SELF = 280,
+    STATIC = 281,
+    STRUCT = 282,
+    TRUE = 283,
+    USE = 284,
+    WHERE = 285,
+    WHILE = 286,
+    LESS_EQUAL = 287,
+    GREAT_EQUAL = 288,
+    EQUAL = 289,
+    NOT_EQUAL = 290,
+    AND_DOUBLE = 291,
+    OR_DOUBLE = 292,
+    ADD_DOUBLE = 293,
+    SUB_DOUBLE = 294,
+    ADD_EQUAL = 295,
+    SUB_EQUAL = 296,
+    MUL_EQUAL = 297,
+    DIV_EQUAL = 298,
+    STR = 299,
+    ID = 300,
+    REAL_NUMBER = 301,
+    INT = 302,
+    FLOAT = 303
   };
 #endif
 /* Tokens.  */
@@ -106,57 +105,57 @@ extern int yydebug;
 #define ENUM 266
 #define EXTERN 267
 #define FALSE 268
-#define FLOAT 269
-#define FOR 270
-#define FN 271
-#define IN 272
-#define INT 273
-#define LET 274
-#define LOOP 275
-#define MATCH 276
-#define MUT 277
-#define PRINT 278
-#define PRINTLN 279
-#define PUB 280
-#define RETURN 281
-#define SELF 282
-#define STATIC 283
-#define STRUCT 284
-#define TRUE 285
-#define USE 286
-#define WHERE 287
-#define WHILE 288
-#define LESS_EQUAL 289
-#define GREAT_EQUAL 290
-#define EQUAL 291
-#define NOT_EQUAL 292
-#define AND_DOUBLE 293
-#define OR_DOUBLE 294
-#define ADD_DOUBLE 295
-#define SUB_DOUBLE 296
-#define ADD_EQUAL 297
-#define SUB_EQUAL 298
-#define MUL_EQUAL 299
-#define DIV_EQUAL 300
-#define NUMBER 301
-#define STR 302
-#define ID 303
-#define REAL_NUMBER 304
+#define FOR 269
+#define FN 270
+#define IN 271
+#define LET 272
+#define LOOP 273
+#define MATCH 274
+#define MUT 275
+#define PRINT 276
+#define PRINTLN 277
+#define PUB 278
+#define RETURN 279
+#define SELF 280
+#define STATIC 281
+#define STRUCT 282
+#define TRUE 283
+#define USE 284
+#define WHERE 285
+#define WHILE 286
+#define LESS_EQUAL 287
+#define GREAT_EQUAL 288
+#define EQUAL 289
+#define NOT_EQUAL 290
+#define AND_DOUBLE 291
+#define OR_DOUBLE 292
+#define ADD_DOUBLE 293
+#define SUB_DOUBLE 294
+#define ADD_EQUAL 295
+#define SUB_EQUAL 296
+#define MUL_EQUAL 297
+#define DIV_EQUAL 298
+#define STR 299
+#define ID 300
+#define REAL_NUMBER 301
+#define INT 302
+#define FLOAT 303
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 15 "FirstYacc.y" /* yacc.c:1909  */
+#line 16 "FirstYacc.y" /* yacc.c:1909  */
 
     struct
     {
         // store yylval's value
         union{
-            char *name;
-            int  val;
-            bool flag;
+            char *val_str;
+            int  val_int;
+            bool val_flag;
+            float val_float;
         };
         char* concat_name;
         // if it is an array element it should be store the index
@@ -167,7 +166,7 @@ union YYSTYPE
         int state; 
     }Data;
 
-#line 171 "y.tab.h" /* yacc.c:1909  */
+#line 170 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
