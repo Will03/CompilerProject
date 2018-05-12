@@ -46,6 +46,8 @@ enum Type_enum{VAL_INT = 0, VAL_BOOL = 1, VAL_STR, VAL_FLOAT, VAL_REAL};
 %type<Data> expression
 %type<Data> object
 %type<Data> statement
+%type<Data> bool_exp
+%type<Data> func_invoke
 //%type<Token> identifier_list
 //%type<Token> argument_list
 //%type<Token> bool_type
@@ -126,14 +128,18 @@ statements:
     statement | statement statements;
 
 statement:
-    declared ';' { Trace("declare id \n");}|
-    simple_state ';';
+    declared { Trace("declare id \n");}|
+    simple_state ';'|
+    bool_exp|
+    condition|
+    loop|
+    block;
 
 
 
 declared:
     func_declared | 
-    identifier_declared ;
+    identifier_declared ';' ;
 
 identifier_declared:
     constant_declared|
@@ -154,7 +160,10 @@ Variable_declared:
     LET MUT ID ':' BOOL '=' BOOL     |
     LET MUT ID ':' STR '=' STR       |
     LET MUT ID ':' FLOAT '=' FLOAT   |
-    LET MUT ID ':' REAL_NUMBER '=' REAL_NUMBER;
+    LET MUT ID ':' REAL_NUMBER '=' REAL_NUMBER|
+    LET MUT ID|
+    LET MUT ID ':' standard_data_type;
+
 
 Array_declared:
     LET MUT ID '[' standard_data_type ',' INT ']';
@@ -186,31 +195,64 @@ func_declared:
     FN ID '(' ')' |
     FN ID '(' ')' '-' '>' standard_data_type;
     
-compound:
-    '{' '}'|
-    '{' statements '}';
+
 
 simple_state:
-    ID '=' expression|
+    ID '=' bool_exp|
     ID '[' expression ']' '=' expression|
     PRINT expression|
-    PRINTLN expression;
+    PRINTLN expression|
  //   READ ID|
- //   return|
- //   return expression;
+    RETURN|
+    RETURN expression;
 
 object:ID;
 
+func_invoke:
+    ID  expression |
+    ID '(' ')';
+
 expression:
- //   func_invoke{$$ = $1;}|
+    func_invoke{$$ = $1;}|
     object {$$ = $1;}|
     standard_data|
     '-' expression|
+    '(' expression ')'|
+    expression ',' expression|
     expression '*' expression
     {
-        if($1.val_type != $3.val_type)
+        if($1.val_type == $3.val_type && $1.val_type  == VAL_FLOAT  )
+        {
+            $$.val_float = $1.val_float * $3.val_float;
+            $$.val_type = VAL_FLOAT;
+            printf("%f",$$.val_float);
+        }
+
+        else if($1.val_type == $3.val_type && $1.val_type  == VAL_INT  )
+        {
+            $$.val_int = $1.val_int * $3.val_int;
+            $$.val_type = VAL_INT;
+            printf("%d",$$.val_int);
+        }
+
+        else if( $3.val_type == VAL_FLOAT && $1.val_type  == VAL_INT  )
+        {
+            $$.val_float = $1.val_int * $3.val_float;
+            $$.val_type = VAL_FLOAT;
+            printf("%f",$$.val_float);
+        }
+
+        else if( $1.val_type == VAL_FLOAT && $3.val_type  == VAL_INT  )
+        {
+            $$.val_float = $1.val_float * $3.val_int;
+            $$.val_type = VAL_FLOAT;
+            printf("%f",$$.val_float);
+        }
+        else 
+        {
             yyerror("type_match_err");
-        $$.val_int = $1.val_int * $3.val_int;
+        }
+        
     }|
     expression '/' expression
     {
@@ -232,6 +274,30 @@ expression:
     };
     
 bool_exp:
+    expression|
+    '!' bool_exp|
+    bool_exp '<' bool_exp|
+    bool_exp '>' bool_exp|
+    bool_exp LESS_EQUAL bool_exp|
+    bool_exp GREAT_EQUAL bool_exp|
+    bool_exp EQUAL bool_exp|
+    bool_exp NOT_EQUAL bool_exp|
+    bool_exp AND_DOUBLE bool_exp|
+    bool_exp OR_DOUBLE bool_exp|
+
+
+
+block:
+    '{' '}'|
+    '{' statements '}';
+
+
+condition:
+    IF '(' bool_exp ')' block ELSE block|
+    IF '(' bool_exp ')' block;
+
+loop:
+    WHILE '(' bool_exp ')' block;
 
 %%
 
