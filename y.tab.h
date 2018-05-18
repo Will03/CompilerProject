@@ -146,11 +146,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 16 "FirstYacc.y" /* yacc.c:1909  */
+#line 17 "FirstYacc.y" /* yacc.c:1909  */
 
     struct
     {
-        // store yylval's value
+
+        char *name;
+        
         union{
             char *val_str;
             int  val_int;
@@ -166,7 +168,7 @@ union YYSTYPE
         int state; 
     }Data;
 
-#line 170 "y.tab.h" /* yacc.c:1909  */
+#line 172 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

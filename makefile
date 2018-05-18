@@ -8,4 +8,4 @@ y.tab.c: FirstYacc.y
 	yacc -d FirstYacc.y
 
 clean:
-	rm -f *.o lex.yy.c
+	rm -f *.o lex.yy.c y.tab.c y.tab.h a.out
