@@ -5,10 +5,10 @@
 #include <string.h>
 #include <math.h>
 #include "SymbolTable.h"
-int yyerror(char *s);
+extern int yyerror(char *s);
 int yylex();
 symTable myTable;
-
+char errWord[256];
 char *declareErr = "error: declare fall";
 
 %}
@@ -109,7 +109,8 @@ char *declareErr = "error: declare fall";
 %right '|'
 %right '&'
 %right '!' 
-// %right '<' '>' LESS_EQUAL GREAT_EQUAL EQUAL NOT_EQUAL
+%right '<' '>' LESS_EQUAL GREAT_EQUAL EQUAL NOT_EQUAL AND_DOUBLE OR_DOUBLE
+%right ADD_DOUBLE SUB_DOUBLE ADD_EQUAL MUL_EQUAL SUB_EQUAL DIV_EQUAL
 %left '+' '-' 
 %left '*'  '/' '%' 
 %right '^'
@@ -331,6 +332,45 @@ Variable_declared:
 
     LET MUT ID ':' standard_data_type  
     {
+        if($5.val_type == VAL_INT)
+        {
+            variableNode v(VAL_INT,0,$3.name,FALSE);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($5.val_type == VAL_STR)
+        {
+            variableNode v(VAL_STR,0,$3.name,FALSE);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($5.val_type == VAL_FLOAT)
+        {
+            variableNode v(VAL_FLOAT,0,$3.name,FALSE);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($5.val_type == VAL_BOOL)
+        {
+            variableNode v(VAL_BOOL,TRUE,$3.name,FALSE);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else{
+            yyerror(declareErr);
+        }
         Trace("LET MUT ID ':' standard_data_type reducing to constant_declared\n");
     };
 
@@ -444,48 +484,31 @@ func_declared:
         }
         Trace("FN ID '(' formal_arguments ')' reducing to func_declared\n");
     }|
-    FN ID '(' formal_arguments ')' '-' '>' INT 
-    {
-        variableNode v(VAL_INT,$8.val_int,$2.name,FALSE);
-        if(!myTable.func_declare(v))
-        {
-            yyerror(declareErr);
-        }
-        Trace("FN ID '(' formal_arguments ')' '-' '>' INT reducing to func_declared\n");
-    } |
-     FN ID '(' formal_arguments ')' '-' '>' BOOL 
-    {
-        variableNode v(VAL_BOOL,$8.val_flag,$2.name,FALSE);
-        if(!myTable.func_declare(v))
-        {
-            yyerror(declareErr);
-        }
-        Trace("FN ID '(' formal_arguments ')' '-' '>' INT reducing to func_declared\n");
-    } |
-     FN ID '(' formal_arguments ')' '-' '>' STR 
-    {
-        variableNode v(VAL_STR,$8.val_str,$2.name,FALSE);
-        if(!myTable.func_declare(v))
-        {
-            yyerror(declareErr);
-        }
-        Trace("FN ID '(' formal_arguments ')' '-' '>' INT reducing to func_declared\n");
-    } |
-     FN ID '(' formal_arguments ')' '-' '>' FLOAT 
-    {
-        variableNode v(VAL_FLOAT,$8.val_float,$2.name,FALSE);
-        if(!myTable.func_declare(v))
-        {
-            yyerror(declareErr);
-        }
-        Trace("FN ID '(' formal_arguments ')' '-' '>' INT reducing to func_declared\n");
-    } |
     FN ID '(' ')'
     {
+        variableNode v(VAL_NULL,$2.name,FALSE);
+        if(!myTable.func_declare(v))
+        {
+            yyerror(declareErr);
+        }
         Trace("FN ID '(' FN ID '(' ')' reducing to func_declared\n");
+    } |
+     FN ID '(' formal_arguments ')' '-' '>' standard_data_type 
+    {
+        variableNode v($8.val_type,$2.name,FALSE);
+        if(!myTable.func_declare(v))
+        {
+            yyerror(declareErr);
+        }
+        Trace("FN ID '(' formal_arguments ')' '-' '>' standard_data_type reducing to func_declared\n");
     } |
     FN ID '(' ')' '-' '>' standard_data_type
     {
+        variableNode v($7.val_type,$2.name,FALSE);
+        if(!myTable.func_declare(v))
+        {
+            yyerror(declareErr);
+        }
         Trace("FN ID '(' ')' '-' '>' standard_data_type reducing to func_declared\n");
     };
     
@@ -494,21 +517,84 @@ func_declared:
 simple_state:
     ID '=' bool_exp ';'
     {
+        if($3.val_type == VAL_INT)
+        {
+            variableNode v($3.val_type,$3.val_int,$1.name,TRUE);
+            myTable.assignVal(v);
+        }
+        else if($3.val_type == VAL_FLOAT)
+        {
+            variableNode v($3.val_type,$3.val_float,$1.name,TRUE);
+            myTable.assignVal(v);
+        }
+        else if($3.val_type == VAL_STR)
+        {
+            variableNode v($3.val_type,$3.val_str,$1.name,TRUE);
+            myTable.assignVal(v);
+        }
+        else if($3.val_type == VAL_BOOL)
+        {
+            variableNode v($3.val_type,$3.val_flag,$1.name,TRUE);
+            myTable.assignVal(v);
+        }
         Trace("ID '=' bool_exp ';' reducing to simple_state\n");
     }|
     ID '[' expression ']' '=' expression ';'
     {
+        if($3.val_type != VAL_INT)
+        {
+            yyerror("need integer type");
+        }
         Trace("ID '[' expression ']' '=' expression ';' reducing to simple_state\n");
     }|
     PRINT expression ';'
     {
+        if($2.val_type == VAL_INT)
+        {
+            printf("%d",$2.val_int);
+        }
+        else if($2.val_type == VAL_FLOAT)
+        {
+            printf("%f",$2.val_float);
+        }
+        else if($2.val_type == VAL_BOOL)
+        {
+            printf("%d",$2.val_flag);
+        }
+        else if($2.val_type == VAL_STR)
+        {
+            printf("%s",$2.val_str);
+        }
+        else{
+            yyerror("print error");
+        }
+        
         Trace("PRINT expression ';' reducing to simple_state\n");
     }|
     PRINTLN expression ';'
     {
+        if($2.val_type == VAL_INT)
+        {
+            printf("%d",$2.val_int);
+        }
+        else if($2.val_type == VAL_FLOAT)
+        {
+            printf("%f",$2.val_float);
+        }
+        else if($2.val_type == VAL_BOOL)
+        {
+            printf("%d",$2.val_flag);
+        }
+        else if($2.val_type == VAL_STR)
+        {
+            printf("%s",$2.val_str);
+        }
+        else{
+            yyerror("print error");
+        }
+        
         Trace("PRINTLN expression ';' reducing to simple_state\n");
     }|
- //   READ ID|
     RETURN ';'
     {
         Trace("RETURN ';' reducing to simple_state\n");
@@ -518,7 +604,7 @@ simple_state:
         Trace("RETURN expression ';'  reducing to simple_state\n");
     };
 
-object:ID;
+
 
 func_arg:
     expression ',' func_arg
@@ -547,23 +633,140 @@ block:
     {
         Trace("'{' '}' reducing to block\n");
     }|
-    '{' {myTable.pushTable();} statements '}'
+    '{' {myTable.pushTable();myTable.dumpTable();Trace("create new table\n");} statements '}' 
     {
         myTable.popTable();
-        Trace("ID '(' ')' reducing to block\n");
+        myTable.dumpTable();
+        Trace("delete table\n");
+        Trace("ID '(' statements ')' reducing to block\n");
     };
+    
+object:ID 
+{
+    variableNode * v = myTable.lookupVar($1.name);
+    strcpy(errWord,"assign wrong\0");
+    if(v != NULL)
+    {
+        $$.name = $1.name;
+        $$.val_type = v->val_Type;
+        if(v->val_Type == VAL_INT)
+            $$.val_int = v->data.val_int;
+        
+        else if(v->val_Type == VAL_FLOAT)
+            $$.val_float = v->data.val_float;
+
+        else if(v->val_Type == VAL_STR)
+            $$.val_str = v->data.val_str;
+
+        else if(v->val_Type == VAL_BOOL)
+            $$.val_flag = v->data.val_flag;
+        
+        else 
+            yyerror(errWord);
+    }
+    else{
+        strcpy(errWord,"can not find variable"); 
+        yyerror(errWord);
+    }   
+};
 
 expression:
     func_invoke{$$ = $1;}|
     object {$$ = $1;}|
-    standard_data|
-    '-' expression|
-    '(' expression ')'|
-    expression '*' expression|
-    expression '/' expression|
-    expression '+' expression|
-    expression '-' expression;
-    
+    standard_data{$$ = $1;}|
+    '-' expression{$$ = $2;}|
+    '(' expression ')'{$$ = $2;}|
+    expression '*' expression
+    {
+        strcpy(errWord,"type error");
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        if($1.val_type != VAL_INT && $1.val_type != VAL_FLOAT)
+            yyerror(errWord);
+        if($1.val_type == VAL_INT)
+        {
+            $$.val_type = $1.val_type;
+            $$.val_int = $1.val_int * $3.val_int;
+        }
+        else if($1.val_type == VAL_FLOAT)
+        {
+            $$.val_type = $1.val_type;
+            $$.val_float = $1.val_float * $3.val_float;
+        }
+        else 
+            yyerror(errWord);
+    }|
+    expression '/' expression
+    {
+        strcpy(errWord,"type error");
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        if($1.val_type != VAL_INT && $1.val_type != VAL_FLOAT)
+            yyerror(errWord);
+        if($1.val_type == VAL_INT)
+        {
+            if($3.val_int == 0)
+            {
+                strcpy(errWord,"divide 0");
+                yyerror(errWord);
+            }
+            $$.val_type = $1.val_type;
+            $$.val_int = $1.val_int / $3.val_int;
+        }
+        else if($1.val_type == VAL_FLOAT)
+        {
+            if($3.val_float == 0)
+            {
+                strcpy(errWord,"divide 0");
+                yyerror(errWord);
+            }
+            $$.val_type = $1.val_type;
+            $$.val_float = $1.val_float / $3.val_float;
+        }
+        else 
+            yyerror(errWord);
+    }|
+    expression '+' expression
+    {
+        strcpy(errWord,"type error");
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        if($1.val_type != VAL_INT && $1.val_type != VAL_FLOAT)
+            yyerror(errWord);
+        if($1.val_type == VAL_INT)
+        {
+            $$.val_type = $1.val_type;
+            $$.val_int = $1.val_int + $3.val_int;
+        }
+        else if($1.val_type == VAL_FLOAT)
+        {
+            $$.val_type = $1.val_type;
+            $$.val_float = $1.val_float + $3.val_float;
+        }
+        else 
+            yyerror(errWord);
+    }|
+    expression '-' expression
+    {
+        strcpy(errWord,"type error");
+
+        if($1.val_type != VAL_INT && $1.val_type != VAL_FLOAT)
+            yyerror(errWord);
+        if($1.val_type == VAL_INT)
+        {
+            $$.val_type = $1.val_type;
+            $$.val_int = $1.val_int - $3.val_int;
+        }
+        else if($1.val_type == VAL_FLOAT)
+        {
+            $$.val_type = $1.val_type;
+            $$.val_float = $1.val_float - $3.val_float;
+        }
+        else 
+            yyerror(errWord);
+    };
+
+
 bool_exp:
     expression|
     '!' bool_exp|

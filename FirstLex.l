@@ -20,8 +20,11 @@ real {plainreal}|{expreal}
 #include "y.tab.h"
 #define MAX_LINE_LENG 256
 #define LIST strcat(buf,yytext)
-#define token(t) {LIST; printf("<'%s'>\n",yytext);return (t);}
-#define tokenInteger(t,i) {LIST; printf("<%s:%d>\n",t,atoi(i));yylval.Data.val_int = atoi(i); yylval.Data.val_type = VAL_INT;return(INT);}
+//printf("<'%s'>\n",yytext);
+#define token(t) {LIST; return (t);}
+//printf("<%s:%d>\n",t,atoi(i));
+#define tokenInteger(t,i) {LIST;yylval.Data.val_int = atoi(i); yylval.Data.val_type = VAL_INT;return(INT);}
+//printf("<%s:%s>\n",t,s);
 #define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s); yylval.Data.val_str = strdup(s); yylval.Data.val_type = VAL_STR; return(STR);}
 enum Type_enum{VAL_INT = 1, VAL_BOOL, VAL_STR, VAL_FLOAT, VAL_REAL};
 int linenum = 1;
