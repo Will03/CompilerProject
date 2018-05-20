@@ -51,7 +51,7 @@ int symTable::var_declare(variableNode v)
     if(sameArr == NULL)
     {
         myTable.back().varNode.push_back(v);
-        //dumpTable();   
+        std::cout << "--------------------------------------------\n"<<"PUSH variable => name = "<< v.name<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;
     }
     else{
@@ -84,6 +84,7 @@ int symTable::func_declare(variableNode v)
     {
         myFunc.push_back(v);
         //dumpTable();   
+        std::cout <<"--------------------------------------------\n"<< "PUSH function => name = "<< v.name<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;
     }
     else{
@@ -114,6 +115,7 @@ int symTable::array_declare(int type,int num,char* vName)
     arrayNode a;
     a.val_Type = type;
     a.name =vName;
+    std::cout << "--------------------------------------------\n"<<"PUSH array => name = "<< vName<<std::endl<< "--------------------------------------------"<<std::endl;  
     if(a.val_Type = VAL_INT)
     {
         for(int i =0;i<num;i++)
@@ -298,7 +300,7 @@ void symTable::popTable()
     if(tableBegin->varNode.size() !=0){
         for(variableBegin = tableBegin->varNode.begin();variableBegin != tableBegin->varNode.end();variableBegin++)
         {
-            std::cout << "variable => name = "<< variableBegin->name<<"   type = ";
+            std::cout << "POP variable => name = "<< variableBegin->name<<"   type = ";
 
             if(variableBegin->val_Type == VAL_INT)
             {
@@ -320,7 +322,7 @@ void symTable::popTable()
 
         for(arrBegin = tableBegin->arrNode.begin();arrBegin != tableBegin->arrNode.end();arrBegin++)
         {
-            std::cout << "array => name = ";
+            std::cout << "POP array => name = ";
             std::cout << arrBegin->name;
             std::cout << "   type = ";
             switch(arrBegin->val_Type){

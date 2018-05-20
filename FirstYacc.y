@@ -10,7 +10,7 @@ int yylex();
 symTable myTable;
 char errWord[256];
 char *declareErr = "error: declare fall";
-
+int is_push = 0;
 %}
 
 %union 
@@ -237,7 +237,7 @@ Variable_declared:
             {
                 yyerror(declareErr);
             }
-            Trace("LET MUT ID '=' FLOAT reducing to constant_declared\n");
+            Trace("LET MUT ID '=' FLOAT reducing to Variable_declared\n");
         }
         else if($5.val_type == VAL_STR)
         {
@@ -269,7 +269,7 @@ Variable_declared:
         else{
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '=' standard_data reducing to constant_declared\n");
+        Trace("LET MUT ID '=' standard_data reducing to Variable_declared\n");
     }|
     LET MUT ID ':' standard_data_type '=' standard_data        
     {
@@ -315,7 +315,7 @@ Variable_declared:
         else{
             yyerror(declareErr);
         }
-        Trace("LET MUT ID ':' standard_data_type '=' standard_data reducing to constant_declared\n");
+        Trace("LET MUT ID ':' standard_data_type '=' standard_data reducing to Variable_declared\n");
     }|
     LET MUT ID                        
     {
@@ -325,7 +325,7 @@ Variable_declared:
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID reducing to constant_declared\n");
+        Trace("LET MUT ID reducing to Variable_declared\n");
     }|
 
     
@@ -382,7 +382,7 @@ Array_declared:
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '[' INT ',' INT ']' reducing to constant_declared\n");
+        Trace("LET MUT ID '[' INT ',' INT ']' reducing to Array_declared\n");
     }|
     LET MUT ID '[' FLOAT ',' INT ']' 
     {
@@ -390,7 +390,7 @@ Array_declared:
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '[' FLOAT ',' INT ']' reducing to constant_declared\n");
+        Trace("LET MUT ID '[' FLOAT ',' INT ']' reducing to Array_declared\n");
     }|
     LET MUT ID '[' STR ',' INT ']' 
     {
@@ -398,7 +398,7 @@ Array_declared:
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '[' STR ',' INT ']' reducing to constant_declared\n");
+        Trace("LET MUT ID '[' STR ',' INT ']' reducing to Array_declared\n");
     }|
     LET MUT ID '[' BOOL ',' INT ']' 
     {
@@ -406,7 +406,7 @@ Array_declared:
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '[' BOOL ',' INT ']' reducing to constant_declared\n");
+        Trace("LET MUT ID '[' BOOL ',' INT ']' reducing to Array_declared\n");
     };
 
 standard_data_type:
@@ -461,6 +461,50 @@ standard_data:
 formal_argment:
     ID ':' standard_data_type
     {
+        if(!is_push)
+        {
+            myTable.pushTable();printf("create new table\n");
+            is_push = 1;
+        }
+        if($3.val_type == VAL_INT)
+        {
+            variableNode v(VAL_INT,0,$1.name,false);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($3.val_type == VAL_STR)
+        {
+            variableNode v(VAL_STR,0,$1.name,false);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($3.val_type == VAL_FLOAT)
+        {
+            variableNode v(VAL_FLOAT,0,$1.name,false);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($3.val_type == VAL_BOOL)
+        {
+            variableNode v(VAL_BOOL,TRUE,$1.name,false);
+
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else{
+            yyerror(declareErr);
+        }
         Trace("ID ':' standard_data_type reducing to formal_argment\n");
     };
 
@@ -474,17 +518,41 @@ formal_arguments:
         Trace("formal_argument reducing to formal_arguments\n");
     };                    
 
+func_block:
+    '{' '}'
+    {
+        Trace("'{' '}' reducing to block\n");
+    }|
+    '{' 
+    
+    {
+        if(!is_push)
+        {
+            myTable.pushTable();printf("create new table\n");
+            is_push = 1;
+        }
+    }
+    statements '}' 
+    {
+        //myTable.dumpTable();
+        myTable.popTable();
+        Trace("delete table\n");
+        Trace("ID '(' statements ')' reducing to block\n");
+    };
+
+
 func_declared:
-    FN ID '(' formal_arguments ')' block
+    FN ID '(' formal_arguments ')' func_block
     {
         variableNode v(VAL_NULL,$2.name,false);
+        is_push = 0;
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
         Trace("FN ID '(' formal_arguments ')' reducing to func_declared\n");
     }|
-    FN ID '(' ')' block
+    FN ID '(' ')' func_block
     {
         variableNode v(VAL_NULL,$2.name,false);
         if(!myTable.func_declare(v))
@@ -493,18 +561,20 @@ func_declared:
         }
         Trace("FN ID '(' FN ID '(' ')' reducing to func_declared\n");
     } |
-     FN ID '(' formal_arguments ')' '-' '>' standard_data_type  block
+     FN ID '('formal_arguments ')' '-' '>'  standard_data_type   func_block
     {
         variableNode v($8.val_type,$2.name,false);
+        is_push = 0;
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
         Trace("FN ID '(' formal_arguments ')' '-' '>' standard_data_type reducing to func_declared\n");
     } |
-    FN ID '(' ')' '-' '>' standard_data_type block
+    FN ID '(' ')' '-' '>' standard_data_type func_block
     {
         variableNode v($7.val_type,$2.name,false);
+        is_push = 0;
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
@@ -818,4 +888,7 @@ int main(int argc, char const *argv[])
     if (yyparse() == 1) 
                     /* parsing */
         yyerror("Parsing error !");     /* syntax error */
+
+    printf("\n\nEND PROGRAM\n");
+    myTable.dumpTable();
 }
