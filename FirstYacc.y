@@ -143,7 +143,7 @@ identifier_declared:
     Array_declared        {Trace("Array_declared reducing to identifier_declared\n");};
 
 constant_declared:
-    LET ID '=' standard_data  
+    LET ID '=' expression  
     {
         if($4.val_type == VAL_INT)
         {
@@ -182,8 +182,12 @@ constant_declared:
         }
         Trace("LET ID '=' standard_data_type reducing to constant_declared\n");
     }|
-    LET ID ':' standard_data_type '=' standard_data         
+    LET ID ':' standard_data_type '=' expression         
     {
+        if($4.val_type != $6.val_type)
+        {
+            yyerror(declareErr);
+        }
         if($4.val_type == VAL_INT)
         {
             variableNode v(VAL_INT,$6.val_int,$2.name,TRUE);
@@ -227,7 +231,7 @@ constant_declared:
     };
 
 Variable_declared:
-    LET MUT ID '=' standard_data
+    LET MUT ID '=' expression
     {
         if($5.val_type == VAL_INT)
         {
@@ -376,37 +380,17 @@ Variable_declared:
 
 
 Array_declared:
-    LET MUT ID '[' INT ',' INT ']' 
+    LET MUT ID '[' standard_data_type ',' expression ']' 
     {
-        if(!myTable.array_declare(VAL_INT,$7.val_int,$5.name))
+        if($7.val_type!= VAL_INT)
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '[' INT ',' INT ']' reducing to Array_declared\n");
-    }|
-    LET MUT ID '[' FLOAT ',' INT ']' 
-    {
-        if(!myTable.array_declare(VAL_FLOAT,$7.val_int,$5.name))
+        if(!myTable.array_declare($5.val_type,$7.val_int,$3.name))
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '[' FLOAT ',' INT ']' reducing to Array_declared\n");
-    }|
-    LET MUT ID '[' STR ',' INT ']' 
-    {
-        if(!myTable.array_declare(VAL_STR,$7.val_int,$5.name))
-        {
-            yyerror(declareErr);
-        }
-        Trace("LET MUT ID '[' STR ',' INT ']' reducing to Array_declared\n");
-    }|
-    LET MUT ID '[' BOOL ',' INT ']' 
-    {
-        if(!myTable.array_declare(VAL_BOOL,$7.val_int,$5.name))
-        {
-            yyerror(declareErr);
-        }
-        Trace("LET MUT ID '[' BOOL ',' INT ']' reducing to Array_declared\n");
+        Trace("LET MUT ID '[' standard_data_type ',' expression ']' reducing to Array_declared\n");
     };
 
 standard_data_type:
@@ -542,45 +526,47 @@ func_block:
 
 
 func_declared:
-    FN ID '(' formal_arguments ')' func_block
+    FN ID '(' formal_arguments ')'
     {
         variableNode v(VAL_NULL,$2.name,false);
-        is_push = 0;
+
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
         Trace("FN ID '(' formal_arguments ')' reducing to func_declared\n");
-    }|
-    FN ID '(' ')' func_block
-    {
+    } func_block{is_push = 0;}
+    |
+    FN ID '(' ')' {
         variableNode v(VAL_NULL,$2.name,false);
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
         Trace("FN ID '(' FN ID '(' ')' reducing to func_declared\n");
-    } |
-     FN ID '('formal_arguments ')' '-' '>'  standard_data_type   func_block
-    {
+    } func_block{is_push = 0;}
+     |
+     FN ID '('formal_arguments ')' '-' '>'  standard_data_type
+     {
         variableNode v($8.val_type,$2.name,false);
-        is_push = 0;
+        
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
         Trace("FN ID '(' formal_arguments ')' '-' '>' standard_data_type reducing to func_declared\n");
-    } |
-    FN ID '(' ')' '-' '>' standard_data_type func_block
+    } func_block{is_push = 0;}
+     |
+    FN ID '(' ')' '-' '>' standard_data_type
     {
         variableNode v($7.val_type,$2.name,false);
-        is_push = 0;
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
         Trace("FN ID '(' ')' '-' '>' standard_data_type reducing to func_declared\n");
-    };
+    } func_block {is_push = 0;}
+    ;
     
 
 

@@ -115,29 +115,30 @@ int symTable::array_declare(int type,int num,char* vName)
     arrayNode a;
     a.val_Type = type;
     a.name =vName;
+    std::cout<<a.val_Type <<"  "<<num <<"   "<<vName<<std::endl;
     std::cout << "--------------------------------------------\n"<<"PUSH array => name = "<< vName<<std::endl<< "--------------------------------------------"<<std::endl;  
-    if(a.val_Type = VAL_INT)
+    if(a.val_Type == VAL_INT)
     {
         for(int i =0;i<num;i++)
             a.array.arr_int.push_back(0);
     }
-    else if(a.val_Type = VAL_FLOAT)
+    else if(a.val_Type == VAL_FLOAT)
     {
         for(int i =0;i<num;i++)
             a.array.arr_float.push_back(0);
     }
-    else if(a.val_Type = VAL_STR)
+    else if(a.val_Type == VAL_STR)
     {
         for(int i =0;i<num;i++)
             a.array.arr_str.push_back(NULL);
     }   
-    else if(a.val_Type = VAL_BOOL)
+    else if(a.val_Type == VAL_BOOL)
     {
         for(int i =0;i<num;i++)
             a.array.arr_float.push_back(true);
     }
+    
     myTable.back().arrNode.push_back(a);
-    //dumpTable();
     return 1;
 }
 
