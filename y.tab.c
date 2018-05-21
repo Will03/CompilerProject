@@ -2120,7 +2120,7 @@ yyreduce:
         }
         else if((yyvsp[-1].Data).val_type == VAL_STR)
         {
-            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_str,(yyvsp[-6].Data).name,false);
+            variableNode v((yyvsp[-1].Data).val_type,strdup((yyvsp[-1].Data).val_str),(yyvsp[-6].Data).name,false);
             myTable.assignArr((yyvsp[-4].Data).val_int,v);
         }
         else if((yyvsp[-1].Data).val_type == VAL_BOOL)

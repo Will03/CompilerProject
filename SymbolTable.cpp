@@ -104,7 +104,7 @@ int symTable::assignArr(int index,variableNode v)
                 std::cout<<"assign array error"<<std::endl;
                 return 0;
             }
-            aNode->array.arr_str[index] = v.data.val_str;
+            aNode->array.arr_str[index] = strdup(v.data.val_str);
             
         }
         std::cout<<"assign array success"<<std::endl;
@@ -200,7 +200,7 @@ int symTable::array_declare(int type,int num,char* vName)
     else if(a.val_Type == VAL_STR)
     {
         for(int i =0;i<num;i++)
-            a.array.arr_str.push_back(NULL);
+            a.array.arr_str.push_back(strdup("????"));
     }   
     else if(a.val_Type == VAL_BOOL)
     {
@@ -287,14 +287,14 @@ int symTable::dumpTable(){
                 case 2:
                     for(int i = 0;i<arrBegin->array.arr_flag.size();i++)
                     {
-                        std::cout<<std::endl<<" name = " << arrBegin->name <<"  type = BOOL  value = "<<arrBegin->array.arr_flag[i];;
+                        std::cout<<std::endl<<" name = " << arrBegin->name <<"  type = BOOL  value = "<<arrBegin->array.arr_flag[i];
                     
                     }
                     break;
                 case 3:
                     for(int i = 0;i<arrBegin->array.arr_str.size();i++)
                     {
-                        std::cout<<std::endl<<" name = " << arrBegin->name <<"  type = STR  value = "<< arrBegin->array.arr_str[i];;
+                        std::cout<<std::endl<<" name = " << arrBegin->name <<"  type = STR  value = "<< arrBegin->array.arr_str[i];
                     
                     }
                     break;
@@ -302,7 +302,7 @@ int symTable::dumpTable(){
                     
                     for(int i = 0;i<arrBegin->array.arr_float.size();i++)
                     {
-                        std::cout<<std::endl<<" name = " << arrBegin->name <<"  type = FLOAT  value = "<<arrBegin->array.arr_float[i];;
+                        std::cout<<std::endl<<" name = " << arrBegin->name <<"  type = FLOAT  value = "<<arrBegin->array.arr_float[i];
                         
                     }
                     

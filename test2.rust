@@ -5,11 +5,10 @@
 // variables
 let mut c;
 let mut a = 5 + 3243;
-
-let mut zcxxxx[int,3];
-zcxxxx[1] = 333;
+let mut myInt[int,3];
+let mut myString[str,3];
 // function declaration
-/*fn add(a:int, b:int) -> int
+fn add(a:int, b:int) -> int
 {
   return a+b;
 }
@@ -24,6 +23,11 @@ fn main()
   else {
     print c;
   }
+  myInt[0] = 2;
+  myInt[1] = 43;
+  myInt[2] = 88;
+  myString[0] = "goodd";
+  myString[1] = "good";
+  myString[2] = "hell";
   println ("Hello World");
 }
-*/

@@ -615,7 +615,7 @@ simple_state:
         }
         else if($6.val_type == VAL_STR)
         {
-            variableNode v($6.val_type,$6.val_str,$1.name,false);
+            variableNode v($6.val_type,strdup($6.val_str),$1.name,false);
             myTable.assignArr($3.val_int,v);
         }
         else if($6.val_type == VAL_BOOL)

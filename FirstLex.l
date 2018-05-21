@@ -25,7 +25,7 @@ real {plainreal}|{expreal}
 //
 #define tokenInteger(t,i) {LIST;yylval.Data.val_int = atoi(i);printf("<%s:%d>\n",t,atoi(i)); yylval.Data.val_type = VAL_INT;return(INT);}
 //printf("<%s:%s>\n",t,s);
-#define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s);yylval.Data.val_str = strdup(s); yylval.Data.val_type = VAL_STR; return(STR);}
+#define tokenString(t,s) {LIST; printf("<%s:%s>\n",t,s);yylval.Data.val_str = strdup(s); yylval.Data.val_type = VAL_STR;strBuf[0] = 0; return(STR);}
 enum Type_enum{VAL_INT = 1, VAL_BOOL, VAL_STR, VAL_FLOAT, VAL_REAL};
 int linenum = 1;
 char buf[MAX_LINE_LENG];
