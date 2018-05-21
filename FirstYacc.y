@@ -147,7 +147,7 @@ constant_declared:
     {
         if($4.val_type == VAL_INT)
         {
-            variableNode v(VAL_INT,$4.val_int,$2.name,TRUE);
+            variableNode v(VAL_INT,$4.val_int,$2.name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -155,7 +155,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_STR)
         {
-            variableNode v(VAL_STR,$4.val_str,$2.name,TRUE);
+            variableNode v(VAL_STR,$4.val_str,$2.name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -163,7 +163,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,$4.val_flag,$2.name,TRUE);
+            variableNode v(VAL_BOOL,$4.val_flag,$2.name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -171,7 +171,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_FLOAT)
         {
-            variableNode v(VAL_FLOAT,$4.val_float,$2.name,TRUE);
+            variableNode v(VAL_FLOAT,$4.val_float,$2.name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -190,7 +190,7 @@ constant_declared:
         }
         if($4.val_type == VAL_INT)
         {
-            variableNode v(VAL_INT,$6.val_int,$2.name,TRUE);
+            variableNode v(VAL_INT,$6.val_int,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -199,7 +199,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,$6.val_flag,$2.name,TRUE);
+            variableNode v(VAL_BOOL,$6.val_flag,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -208,7 +208,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_STR)
         {
-            variableNode v(VAL_STR,$6.val_str,$2.name,TRUE);
+            variableNode v(VAL_STR,$6.val_str,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -217,7 +217,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_FLOAT)
         {
-            variableNode v(VAL_FLOAT,$6.val_float,$2.name,TRUE);
+            variableNode v(VAL_FLOAT,$6.val_float,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -365,7 +365,7 @@ Variable_declared:
         }
         else if($5.val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,TRUE,$3.name,false);
+            variableNode v(VAL_BOOL,true,$3.name,false);
 
             if(!myTable.var_declare(v))
             {
@@ -575,32 +575,53 @@ simple_state:
     {
         if($3.val_type == VAL_INT)
         {
-            variableNode v($3.val_type,$3.val_int,$1.name,TRUE);
+            variableNode v($3.val_type,$3.val_int,$1.name,true);
             myTable.assignVal(v);
         }
         else if($3.val_type == VAL_FLOAT)
         {
-            variableNode v($3.val_type,$3.val_float,$1.name,TRUE);
+            variableNode v($3.val_type,$3.val_float,$1.name,true);
             myTable.assignVal(v);
         }
         else if($3.val_type == VAL_STR)
         {
-            variableNode v($3.val_type,$3.val_str,$1.name,TRUE);
+            variableNode v($3.val_type,$3.val_str,$1.name,true);
             myTable.assignVal(v);
         }
         else if($3.val_type == VAL_BOOL)
         {
-            variableNode v($3.val_type,$3.val_flag,$1.name,TRUE);
+            variableNode v($3.val_type,$3.val_flag,$1.name,true);
             myTable.assignVal(v);
         }
         Trace("ID '=' bool_exp ';' reducing to simple_state\n");
     }|
     ID '[' expression ']' '=' expression ';'
     {
+        
         if($3.val_type != VAL_INT)
         {
             strcpy(errWord,"need integer type\n");
             yyerror(errWord);
+        }
+        if($6.val_type == VAL_INT)
+        {
+            variableNode v($6.val_type,$6.val_int,$1.name,false);
+            myTable.assignArr($3.val_int,v);
+        }
+        else if($6.val_type == VAL_FLOAT)
+        {
+            variableNode v($6.val_type,$6.val_float,$1.name,false);
+            myTable.assignArr($3.val_int,v);
+        }
+        else if($6.val_type == VAL_STR)
+        {
+            variableNode v($6.val_type,$6.val_str,$1.name,false);
+            myTable.assignArr($3.val_int,v);
+        }
+        else if($6.val_type == VAL_BOOL)
+        {
+            variableNode v($6.val_type,$6.val_flag,$1.name,false);
+            myTable.assignArr($3.val_int,v);
         }
         Trace("ID '[' expression ']' '=' expression ';' reducing to simple_state\n");
     }|

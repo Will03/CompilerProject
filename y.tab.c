@@ -558,11 +558,11 @@ static const yytype_uint16 yyrline[] =
      132,   137,   138,   141,   142,   143,   146,   185,   234,   278,
      324,   337,   383,   397,   402,   407,   412,   417,   424,   429,
      434,   439,   446,   496,   500,   506,   512,   510,   530,   529,
-     540,   540,   550,   549,   561,   560,   574,   598,   607,   632,
-     657,   661,   669,   673,   679,   683,   691,   695,   695,   703,
-     734,   735,   736,   737,   738,   739,   759,   789,   809,   831,
-     832,   833,   834,   835,   836,   837,   838,   839,   840,   847,
-     848,   851
+     540,   540,   550,   549,   561,   560,   574,   598,   628,   653,
+     678,   682,   690,   694,   700,   704,   712,   716,   716,   724,
+     755,   756,   757,   758,   759,   760,   780,   810,   830,   852,
+     853,   854,   855,   856,   857,   858,   859,   860,   861,   868,
+     869,   872
 };
 #endif
 
@@ -1549,7 +1549,7 @@ yyreduce:
     {
         if((yyvsp[0].Data).val_type == VAL_INT)
         {
-            variableNode v(VAL_INT,(yyvsp[0].Data).val_int,(yyvsp[-2].Data).name,TRUE);
+            variableNode v(VAL_INT,(yyvsp[0].Data).val_int,(yyvsp[-2].Data).name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -1557,7 +1557,7 @@ yyreduce:
         }
         else if((yyvsp[0].Data).val_type == VAL_STR)
         {
-            variableNode v(VAL_STR,(yyvsp[0].Data).val_str,(yyvsp[-2].Data).name,TRUE);
+            variableNode v(VAL_STR,(yyvsp[0].Data).val_str,(yyvsp[-2].Data).name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -1565,7 +1565,7 @@ yyreduce:
         }
         else if((yyvsp[0].Data).val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,(yyvsp[0].Data).val_flag,(yyvsp[-2].Data).name,TRUE);
+            variableNode v(VAL_BOOL,(yyvsp[0].Data).val_flag,(yyvsp[-2].Data).name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -1573,7 +1573,7 @@ yyreduce:
         }
         else if((yyvsp[0].Data).val_type == VAL_FLOAT)
         {
-            variableNode v(VAL_FLOAT,(yyvsp[0].Data).val_float,(yyvsp[-2].Data).name,TRUE);
+            variableNode v(VAL_FLOAT,(yyvsp[0].Data).val_float,(yyvsp[-2].Data).name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -1596,7 +1596,7 @@ yyreduce:
         }
         if((yyvsp[-2].Data).val_type == VAL_INT)
         {
-            variableNode v(VAL_INT,(yyvsp[0].Data).val_int,(yyvsp[-4].Data).name,TRUE);
+            variableNode v(VAL_INT,(yyvsp[0].Data).val_int,(yyvsp[-4].Data).name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -1605,7 +1605,7 @@ yyreduce:
         }
         else if((yyvsp[-2].Data).val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,(yyvsp[0].Data).val_flag,(yyvsp[-4].Data).name,TRUE);
+            variableNode v(VAL_BOOL,(yyvsp[0].Data).val_flag,(yyvsp[-4].Data).name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -1614,7 +1614,7 @@ yyreduce:
         }
         else if((yyvsp[-2].Data).val_type == VAL_STR)
         {
-            variableNode v(VAL_STR,(yyvsp[0].Data).val_str,(yyvsp[-4].Data).name,TRUE);
+            variableNode v(VAL_STR,(yyvsp[0].Data).val_str,(yyvsp[-4].Data).name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -1623,7 +1623,7 @@ yyreduce:
         }
         else if((yyvsp[-2].Data).val_type == VAL_FLOAT)
         {
-            variableNode v(VAL_FLOAT,(yyvsp[0].Data).val_float,(yyvsp[-4].Data).name,TRUE);
+            variableNode v(VAL_FLOAT,(yyvsp[0].Data).val_float,(yyvsp[-4].Data).name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -1782,7 +1782,7 @@ yyreduce:
         }
         else if((yyvsp[0].Data).val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,TRUE,(yyvsp[-2].Data).name,false);
+            variableNode v(VAL_BOOL,true,(yyvsp[-2].Data).name,false);
 
             if(!myTable.var_declare(v))
             {
@@ -2076,22 +2076,22 @@ yyreduce:
     {
         if((yyvsp[-1].Data).val_type == VAL_INT)
         {
-            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_int,(yyvsp[-3].Data).name,TRUE);
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_int,(yyvsp[-3].Data).name,true);
             myTable.assignVal(v);
         }
         else if((yyvsp[-1].Data).val_type == VAL_FLOAT)
         {
-            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_float,(yyvsp[-3].Data).name,TRUE);
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_float,(yyvsp[-3].Data).name,true);
             myTable.assignVal(v);
         }
         else if((yyvsp[-1].Data).val_type == VAL_STR)
         {
-            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_str,(yyvsp[-3].Data).name,TRUE);
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_str,(yyvsp[-3].Data).name,true);
             myTable.assignVal(v);
         }
         else if((yyvsp[-1].Data).val_type == VAL_BOOL)
         {
-            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_flag,(yyvsp[-3].Data).name,TRUE);
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_flag,(yyvsp[-3].Data).name,true);
             myTable.assignVal(v);
         }
         Trace("ID '=' bool_exp ';' reducing to simple_state\n");
@@ -2102,18 +2102,39 @@ yyreduce:
   case 47:
 #line 599 "FirstYacc.y" /* yacc.c:1646  */
     {
+        
         if((yyvsp[-4].Data).val_type != VAL_INT)
         {
             strcpy(errWord,"need integer type\n");
             yyerror(errWord);
         }
+        if((yyvsp[-1].Data).val_type == VAL_INT)
+        {
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_int,(yyvsp[-6].Data).name,false);
+            myTable.assignArr((yyvsp[-4].Data).val_int,v);
+        }
+        else if((yyvsp[-1].Data).val_type == VAL_FLOAT)
+        {
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_float,(yyvsp[-6].Data).name,false);
+            myTable.assignArr((yyvsp[-4].Data).val_int,v);
+        }
+        else if((yyvsp[-1].Data).val_type == VAL_STR)
+        {
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_str,(yyvsp[-6].Data).name,false);
+            myTable.assignArr((yyvsp[-4].Data).val_int,v);
+        }
+        else if((yyvsp[-1].Data).val_type == VAL_BOOL)
+        {
+            variableNode v((yyvsp[-1].Data).val_type,(yyvsp[-1].Data).val_flag,(yyvsp[-6].Data).name,false);
+            myTable.assignArr((yyvsp[-4].Data).val_int,v);
+        }
         Trace("ID '[' expression ']' '=' expression ';' reducing to simple_state\n");
     }
-#line 2113 "y.tab.c" /* yacc.c:1646  */
+#line 2134 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 608 "FirstYacc.y" /* yacc.c:1646  */
+#line 629 "FirstYacc.y" /* yacc.c:1646  */
     {
         if((yyvsp[-1].Data).val_type == VAL_INT)
         {
@@ -2138,11 +2159,11 @@ yyreduce:
         
         Trace("PRINT expression ';' reducing to simple_state\n");
     }
-#line 2142 "y.tab.c" /* yacc.c:1646  */
+#line 2163 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 633 "FirstYacc.y" /* yacc.c:1646  */
+#line 654 "FirstYacc.y" /* yacc.c:1646  */
     {
         if((yyvsp[-1].Data).val_type == VAL_INT)
         {
@@ -2167,84 +2188,84 @@ yyreduce:
         
         Trace("PRINTLN expression ';' reducing to simple_state\n");
     }
-#line 2171 "y.tab.c" /* yacc.c:1646  */
+#line 2192 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 658 "FirstYacc.y" /* yacc.c:1646  */
+#line 679 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("RETURN ';' reducing to simple_state\n");
     }
-#line 2179 "y.tab.c" /* yacc.c:1646  */
+#line 2200 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 662 "FirstYacc.y" /* yacc.c:1646  */
+#line 683 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("RETURN expression ';'  reducing to simple_state\n");
     }
-#line 2187 "y.tab.c" /* yacc.c:1646  */
+#line 2208 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 670 "FirstYacc.y" /* yacc.c:1646  */
+#line 691 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("expression ',' func_arg  reducing to func_arg\n");
     }
-#line 2195 "y.tab.c" /* yacc.c:1646  */
+#line 2216 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 674 "FirstYacc.y" /* yacc.c:1646  */
+#line 695 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("expression reducing to func_arg\n");
     }
-#line 2203 "y.tab.c" /* yacc.c:1646  */
+#line 2224 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 680 "FirstYacc.y" /* yacc.c:1646  */
+#line 701 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("ID  '(' func_arg ')' reducing to func_invoke\n");
     }
-#line 2211 "y.tab.c" /* yacc.c:1646  */
+#line 2232 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 684 "FirstYacc.y" /* yacc.c:1646  */
+#line 705 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("ID '(' ')' reducing to func_invoke\n");
     }
-#line 2219 "y.tab.c" /* yacc.c:1646  */
+#line 2240 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 692 "FirstYacc.y" /* yacc.c:1646  */
+#line 713 "FirstYacc.y" /* yacc.c:1646  */
     {
         Trace("'{' '}' reducing to block\n");
     }
-#line 2227 "y.tab.c" /* yacc.c:1646  */
+#line 2248 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 695 "FirstYacc.y" /* yacc.c:1646  */
+#line 716 "FirstYacc.y" /* yacc.c:1646  */
     {myTable.pushTable();Trace("create new table\n");}
-#line 2233 "y.tab.c" /* yacc.c:1646  */
+#line 2254 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 696 "FirstYacc.y" /* yacc.c:1646  */
+#line 717 "FirstYacc.y" /* yacc.c:1646  */
     {
         //myTable.dumpTable();
         myTable.popTable();
         Trace("delete table\n");
         Trace("ID '(' statements ')' reducing to block\n");
     }
-#line 2244 "y.tab.c" /* yacc.c:1646  */
+#line 2265 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 704 "FirstYacc.y" /* yacc.c:1646  */
+#line 725 "FirstYacc.y" /* yacc.c:1646  */
     {
     variableNode * v = myTable.lookupVar((yyvsp[0].Data).name);
     strcpy(errWord,"assign wrong\0");
@@ -2273,41 +2294,41 @@ yyreduce:
         
     }   
 }
-#line 2277 "y.tab.c" /* yacc.c:1646  */
+#line 2298 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 734 "FirstYacc.y" /* yacc.c:1646  */
+#line 755 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[0].Data);}
-#line 2283 "y.tab.c" /* yacc.c:1646  */
+#line 2304 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 735 "FirstYacc.y" /* yacc.c:1646  */
+#line 756 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[0].Data);}
-#line 2289 "y.tab.c" /* yacc.c:1646  */
+#line 2310 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 736 "FirstYacc.y" /* yacc.c:1646  */
+#line 757 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[0].Data);}
-#line 2295 "y.tab.c" /* yacc.c:1646  */
+#line 2316 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 737 "FirstYacc.y" /* yacc.c:1646  */
+#line 758 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[0].Data);}
-#line 2301 "y.tab.c" /* yacc.c:1646  */
+#line 2322 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 738 "FirstYacc.y" /* yacc.c:1646  */
+#line 759 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[-1].Data);}
-#line 2307 "y.tab.c" /* yacc.c:1646  */
+#line 2328 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 740 "FirstYacc.y" /* yacc.c:1646  */
+#line 761 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
@@ -2327,11 +2348,11 @@ yyreduce:
         else 
             yyerror(errWord);
     }
-#line 2331 "y.tab.c" /* yacc.c:1646  */
+#line 2352 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 760 "FirstYacc.y" /* yacc.c:1646  */
+#line 781 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
@@ -2361,11 +2382,11 @@ yyreduce:
         else 
             yyerror(errWord);
     }
-#line 2365 "y.tab.c" /* yacc.c:1646  */
+#line 2386 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 790 "FirstYacc.y" /* yacc.c:1646  */
+#line 811 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
@@ -2385,11 +2406,11 @@ yyreduce:
         else 
             yyerror(errWord);
     }
-#line 2389 "y.tab.c" /* yacc.c:1646  */
+#line 2410 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 810 "FirstYacc.y" /* yacc.c:1646  */
+#line 831 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
 
@@ -2408,17 +2429,17 @@ yyreduce:
         else 
             yyerror(errWord);
     }
-#line 2412 "y.tab.c" /* yacc.c:1646  */
+#line 2433 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 832 "FirstYacc.y" /* yacc.c:1646  */
+#line 853 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[0].Data);}
-#line 2418 "y.tab.c" /* yacc.c:1646  */
+#line 2439 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2422 "y.tab.c" /* yacc.c:1646  */
+#line 2443 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2646,7 +2667,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 853 "FirstYacc.y" /* yacc.c:1906  */
+#line 874 "FirstYacc.y" /* yacc.c:1906  */
 
 
 int yyerror(char *s)

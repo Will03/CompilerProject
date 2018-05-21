@@ -74,9 +74,11 @@ public:
     variableNode *lookupVar(char *name);
     variableNode *lookupVar_for_declare(char *name);
     variableNode *lookupFunc(char *name);
+    arrayNode *lookupArr(char *name);
     int var_declare(variableNode v);
     int func_declare(variableNode v);
     int array_declare(int type,int num,char* vName);
+    int assignArr(int index,variableNode v);
     int assignVal(variableNode v);
     int dumpTable();
     void pushTable();
