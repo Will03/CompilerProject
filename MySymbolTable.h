@@ -1,19 +1,50 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
-typedef struct DNode{
+typedef struct {
     char* name;
-    struct DNode* next;
-}SymDataNode;
+    union{
+        char *val_str;
+        int  val_int;
+        bool val_flag;
+        float val_float;
+    };
 
-SymDataNode* CreateTable(){
-    SymDataNode* myFirstNode;
-    myFirstNode = (SymDataNode* )malloc(sizeof(SymDataNode));
-    return myFirstNode;
+
+    struct VNode* next;
+}VNode;
+
+typedef struct {
+    VNode *varNode;
+    struct TNode* next;
+}TNode;
+
+VNode* CreateVNode(){
+    VNode* node;
+    node = (VNode)malloc(sizeof(VNode));
+    node->next =NULL;
+    return node;
+}
+VNode* CreateTNode(){
+    VNode* node;
+    node = (Tnode* )malloc(sizeof(Tnode));
+    node->next =NULL;
+    return node;
 }
 
-int LookupTable(SymDataNode* myFirstNode,char* s){
-    SymDataNode* lnode = myFirstNode->next;//first node don' have data
+Tnode* CreateTable(){
+    Tnode* myFirstTable;
+    myFirstTable = CreateTNode();
+    myFirstTable->varNode = CreateVNode();
+    return myFirstTable;
+}
+
+int LookupTable(TNode* myFirstTable,char* s){
+    TNode *nowTable = myFirstTable ;
+    for(;nowTable->next !=NULL;)
+        nowTable=nowTable->next;
+    
+    Vnode* lnode = nowTable->varNode->next;//first node don' have data
     for(int i =0;lnode!=NULL;i++){
         if(!strcmp(lnode->name ,s))
         {
