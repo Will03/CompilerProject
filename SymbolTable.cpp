@@ -1,8 +1,11 @@
 #include "SymbolTable.h"
 
+//for assign variable, we need to check the name is appear
 int symTable::assignVal(variableNode v)
 {
     variableNode* assignNode;
+
+    //find out the variable
     if(assignNode = lookupVar(v.name))
     {
         if(assignNode->is_const)
@@ -10,6 +13,7 @@ int symTable::assignVal(variableNode v)
             printf("error: this is const value can't modify");
             return 0;
         }
+        //find the value and assign
         if(v.val_Type == assignNode->val_Type)
         {
             if(v.val_Type == VAL_INT)
@@ -45,8 +49,13 @@ symTable::symTable()
     myTable.push_back(tableNode());
 }
 
+//search the array use name
 arrayNode *symTable::lookupArr(char *name)
 {
+    //create reverse_iterator.
+    //so search will start at last table
+    // if find the array return arrayNode *
+    //else return NULL 
     std::vector<tableNode>::reverse_iterator tableBegin;
     std::vector<arrayNode>::iterator arrayBegin;
     for(tableBegin = myTable.rbegin();tableBegin!=myTable.rend();tableBegin++)
@@ -62,11 +71,14 @@ arrayNode *symTable::lookupArr(char *name)
     return NULL;    
 }
 
+//assign array
 int symTable::assignArr(int index,variableNode v)
 {
+    //find the target array
     arrayNode *aNode = lookupArr(v.name);
     if(aNode != NULL)
     {
+        //for INT type
         if(v.val_Type == VAL_INT)
         {   
             if(index >= aNode->array.arr_int.size())
@@ -77,6 +89,7 @@ int symTable::assignArr(int index,variableNode v)
             aNode->array.arr_int[index] = v.data.val_int;
             std::cout<<v.data.val_int<<std::endl;
         }
+        //for Float type
         else if(v.val_Type == VAL_FLOAT)
         {   
             if(index >= aNode->array.arr_float.size())
@@ -87,6 +100,7 @@ int symTable::assignArr(int index,variableNode v)
             aNode->array.arr_float[index] = v.data.val_float;
 
         }
+        //for boolen type
         else if(v.val_Type == VAL_BOOL)
         {
                
@@ -97,6 +111,7 @@ int symTable::assignArr(int index,variableNode v)
             }
             aNode->array.arr_flag[index] = v.data.val_flag;
         }
+        //for string type
         else if(v.val_Type == VAL_STR)
         {   
             if(index >= aNode->array.arr_str.size())
