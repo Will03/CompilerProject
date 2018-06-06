@@ -136,6 +136,8 @@ int symTable::var_declare(variableNode v)
     variableNode* sameArr = lookupVar_for_declare(v.name);
     if(sameArr == NULL)
     {
+
+        v.index = stackIndex++;
         myTable.back().varNode.push_back(v);
         std::cout << "--------------------------------------------\n"<<"PUSH variable => name = "<< v.name<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;
@@ -169,6 +171,7 @@ int symTable::func_declare(variableNode v)
     if(sameArr == NULL)
     {
         myFunc.push_back(v);
+        stackIndex = 0;
         //dumpTable();   
         std::cout <<"--------------------------------------------\n"<< "PUSH function => name = "<< v.name<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;
@@ -205,6 +208,7 @@ int symTable::array_declare(int type,int num,char* vName)
     if(a.val_Type == VAL_INT)
     {
         for(int i =0;i<num;i++)
+            a.index = stackIndex++;
             a.array.arr_int.push_back(0);
     }
     else if(a.val_Type == VAL_FLOAT)
@@ -234,7 +238,7 @@ int symTable::dumpTable(){
     std::vector<variableNode>::iterator funcBegin;
     std::vector<arrayNode>::iterator arrBegin;
     
-    std::cout<<"--------------------------------------------"<<std::endl;
+    std::cout<<"------------2222--------------------------------"<<std::endl;
     for(funcBegin = myFunc.begin();funcBegin!= myFunc.end();funcBegin++)
     {
         std::cout << "Function => name = ";
@@ -387,8 +391,27 @@ variableNode *symTable::lookupFunc(char *name)
 
 }
 
-void symTable::pushTable()
+variableNode * symTable::pushTableVar(int num)
 {
+    std::vector<tableNode>::iterator tableBegin = myTable.end()-1;
+    if(num < tableBegin->varNode.size())
+    {
+       return (&*tableBegin->varNode.begin()+num);
+    }
+    
+    return NULL;
+}
+int symTable::checkGlobal()
+{
+    if(myTable.size() == 1){
+        return 1;
+    }
+}
+void symTable::pushTable()
+{    
+    if(myTable.size() == 1){
+        stackIndex = 1;
+    }
     myTable.push_back(tableNode());
 }
 void symTable::popTable()

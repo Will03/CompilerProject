@@ -27,6 +27,8 @@ struct arrayNode{
     arrData array;
     int val_Type; 
     char *name;
+	int index;
+    int isGlobal;
 };
 
 
@@ -37,6 +39,8 @@ struct variableNode{
     // int => 0 = T_INT bool => 1 = T_BOOL string => 3 = T_STR real => 3 = T_REAL
     int val_Type; 
     bool is_const;
+	int index;
+    int isGlobal;
 
     //for int
     variableNode(int type,int value, char* vName,bool v_const){
@@ -102,6 +106,9 @@ public:
     int dumpTable();
     void pushTable();
 	void popTable();
+    int checkGlobal();
+    variableNode * pushTableVar(int num);
+    int stackIndex = 1;
 private:
     std::vector <tableNode> myTable;
     std::vector <variableNode> myFunc;

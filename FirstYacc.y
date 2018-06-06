@@ -8,9 +8,10 @@
 extern int yyerror(char *s);
 int yylex();
 symTable myTable;
+int funcArgSize;
 char errWord[256];
 char *declareErr = "error: declare fall";
-int is_push = 0;
+FILE *myJavaCode;
 %}
 
 %union 
@@ -425,31 +426,35 @@ standard_data:
     {
         $$.val_type =  VAL_INT;$$.val_int = $1.val_int; 
         Trace("INT reducing to standard_data\n");
+        fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_int);
     } |
     BOOL 
     {
         $$.val_type = VAL_BOOL;$$.val_flag = $1.val_flag; 
         Trace("BOOL reducing to standard_data\n");
+
+            if($$.val_flag)    
+                fprintf(myJavaCode, "\t\tsipush %d\n", 1);
+            else        
+                fprintf(myJavaCode, "\t\tsipush %d\n", 0);
     } |
     STR   
     {
         $$.val_type = VAL_STR;$$.val_str = $1.val_str;
         Trace("STR reducing to standard_data\n");
+        fprintf(myJavaCode, "\t\tsipush %s\n", $1.val_str);
      } |
     FLOAT 
     {
         $$.val_type = VAL_FLOAT;$$.val_float = $1.val_float; 
         Trace("FLOAT reducing to standard_data\n");
+        fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_float);
     };
 
 formal_argment:
     ID ':' standard_data_type
     {
-        if(!is_push)
-        {
-            myTable.pushTable();printf("create new table\n");
-            is_push = 1;
-        }
+
         if($3.val_type == VAL_INT)
         {
             variableNode v(VAL_INT,0,$1.name,false);
@@ -495,77 +500,129 @@ formal_argment:
 formal_arguments:
     formal_argment ',' formal_arguments
     {
+        funcArgSize+=1;
         Trace("formal_argment ',' formal_arguments reducing to formal_arguments\n");
     } |
     formal_argment
     {
+        funcArgSize+=1;
         Trace("formal_argument reducing to formal_arguments\n");
     };                    
 
 func_block:
-    '{' '}'
-    {
+    '{' '}' {
         Trace("'{' '}' reducing to block\n");
+        fprintf(myJavaCode,"\t}\n");
     }|
-    '{' 
-    
-    {
-        if(!is_push)
-        {
-            myTable.pushTable();printf("create new table\n");
-            is_push = 1;
-        }
-    }
-    statements '}' 
-    {
+    '{' statements '}' {
         //myTable.dumpTable();
         myTable.popTable();
         Trace("delete table\n");
         Trace("ID '(' statements ')' reducing to block\n");
+        fprintf(myJavaCode,"\t}\n");
     };
 
+func_sign:
+    FN {
+        funcArgSize = 0;
+        myTable.pushTable();printf("create new table\n");
+        
+        };
 
-func_declared:
-    FN ID '(' formal_arguments ')'
-    {
+func_declared: 
+    func_sign ID '('formal_arguments ')'{
+        
         variableNode v(VAL_NULL,$2.name,false);
-
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
+        fprintf(myJavaCode,"\tmethod public static void %s (", $2.name);
+
+        for(int i = 0;i< funcArgSize;i++)
+        {
+            myTable.dumpTable();
+            variableNode * target = myTable.pushTableVar(i);
+            if(target!=NULL)
+            {
+                if(target->val_Type == VAL_INT)
+                {
+                    fprintf(myJavaCode,"int");
+                }
+                else if(target->val_Type == VAL_BOOL)
+                {
+                    fprintf(myJavaCode,"boolean");
+                }
+                else if(target->val_Type == VAL_STR)
+                {
+                    fprintf(myJavaCode,"srting");
+                }
+ 
+            }
+            else
+                break;
+
+            if(i<funcArgSize-1)fprintf(myJavaCode,", ");
+        }
+        fprintf(myJavaCode,")\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
         Trace("FN ID '(' formal_arguments ')' reducing to func_declared\n");
-    } func_block{is_push = 0;}
+
+    } func_block
     |
-    FN ID '(' ')' {
+    
+    func_sign ID '(' ')' {
         variableNode v(VAL_NULL,$2.name,false);
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
-        Trace("FN ID '(' FN ID '(' ')' reducing to func_declared\n");
-    } func_block{is_push = 0;}
+        if (strcmp($2.name, "main") == 0){
+            fprintf(myJavaCode,"\tmethod public static void main(java.lang.String[])\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
+        }
+
+        else{
+            fprintf(myJavaCode,"\tmethod public static void %s()\n\tmax_stack 30\n\tmax_locals 30\n\t{\n", $2.name);
+        }
+        Trace("FN ID '(' ')' reducing to func_declared\n");
+    } func_block
      |
-     FN ID '('formal_arguments ')' '-' '>'  standard_data_type
+     
+     func_sign ID '(' formal_arguments ')' '-' '>'  standard_data_type
      {
         variableNode v($8.val_type,$2.name,false);
-        
+        if (strcmp($2.name, "main") == 0){
+            if($8.val_type == VAL_INT)
+                fprintf(myJavaCode,"\tmethod public static int main(java.lang.String[])\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
+            else if($8.val_type == VAL_BOOL)
+                fprintf(myJavaCode,"\tmethod public static boolean main(java.lang.String[])\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
+            else if($8.val_type == VAL_STR)
+                fprintf(myJavaCode,"\tmethod public static string main(java.lang.String[])\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
+            }    
+        else{
+            if($2.val_type == VAL_INT)
+                fprintf(myJavaCode,"\tmethod public static int %s()\n\tmax_stack 30\n\tmax_locals 30\n\t{\n", $2.name);
+            else if($2.val_type == VAL_BOOL)
+                fprintf(myJavaCode,"\tmethod public static boolean %s()\n\tmax_stack 30\n\tmax_locals 30\n\t{\n", $2.name);
+            else if($2.val_type == VAL_STR)
+                fprintf(myJavaCode,"\tmethod public static string %s()\n\tmax_stack 30\n\tmax_locals 30\n\t{\n", $2.name);
+            }
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
-        Trace("FN ID '(' formal_arguments ')' '-' '>' standard_data_type reducing to func_declared\n");
-    } func_block{is_push = 0;}
-     |
-    FN ID '(' ')' '-' '>' standard_data_type
+        Trace("FN ID '(' formal_arguments ')' func_sign standard_data_type reducing to func_declared\n");
+    } func_block
+    |
+    
+    func_sign ID '(' ')'  '-' '>' standard_data_type
     {
         variableNode v($7.val_type,$2.name,false);
         if(!myTable.func_declare(v))
         {
             yyerror(declareErr);
         }
-        Trace("FN ID '(' ')' '-' '>' standard_data_type reducing to func_declared\n");
-    } func_block {is_push = 0;}
+        Trace("FN ID '(' ')' func_sign standard_data_type reducing to func_declared\n");
+    } func_block 
     ;
     
 
@@ -889,8 +946,8 @@ int main(int argc, char const *argv[])
     //    printf ("Usage: sc filename\n");
     //    exit(1);
     //}
-    //yyin = fopen(argv[1], "r");         /* open input file */
-
+    myJavaCode = fopen("Will.jasm", "w");         /* open input file */
+    fprintf(myJavaCode,"class proj3\n{\n");
     /* perform parsing */
     if (yyparse() == 1) 
                     /* parsing */
@@ -898,4 +955,9 @@ int main(int argc, char const *argv[])
 
     printf("\n\nEND PROGRAM\n");
     myTable.dumpTable();
+
+    fprintf(myJavaCode,"}");
+    fclose(myJavaCode);
+    return 0;
+    
 }

@@ -8,9 +8,9 @@ let mut a = 5 + 3243;
 let mut myInt[int,3];
 let mut myString[str,3];
 // function declaration
-fn add(a:int, b:int) -> int
+fn add(a:int, b:int)
 {
-  return a+b;
+  //return a+b;
 }
     
 // main function
