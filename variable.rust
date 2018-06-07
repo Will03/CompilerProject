@@ -1,10 +1,10 @@
 let mut a = false;
-let mut b:bool = false;
-let mut c;
+let mut b:bool = true;
+let mut c = 22;
 fn add(a:int, b:int) -> int
 {
-   let mut d = true;
-   let mut e:bool = false;
+   let mut d = 33;
+   let mut e:bool = true;
 }
 
 fn add(a:int, b:int) -> int

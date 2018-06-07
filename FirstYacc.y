@@ -9,6 +9,7 @@ extern int yyerror(char *s);
 int yylex();
 symTable myTable;
 int funcArgSize;
+int constDeclar;
 char errWord[256];
 char *declareErr = "error: declare fall";
 FILE *myJavaCode;
@@ -144,37 +145,37 @@ identifier_declared:
     Array_declared        {Trace("Array_declared reducing to identifier_declared\n");};
 
 constant_declared:
-    LET ID '=' expression  
+    LET ID '='{constDeclar = 1;} expression  
     {
-        if($4.val_type == VAL_INT)
+        if($5.val_type == VAL_INT)
         {
-            variableNode v(VAL_INT,$4.val_int,$2.name,true);
+            variableNode v(VAL_INT,$5.val_int,$2.name,true);
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+            constDeclar = 0;
+        }
+        else if($5.val_type == VAL_STR)
+        {
+            variableNode v(VAL_STR,$5.val_str,$2.name,true);
+            if(!myTable.var_declare(v))
+            {
+                yyerror(declareErr);
+            }
+        }
+        else if($5.val_type == VAL_BOOL)
+        {
+            variableNode v(VAL_BOOL,$5.val_flag,$2.name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
             }
             
         }
-        else if($4.val_type == VAL_STR)
+        else if($5.val_type == VAL_FLOAT)
         {
-            variableNode v(VAL_STR,$4.val_str,$2.name,true);
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-        }
-        else if($4.val_type == VAL_BOOL)
-        {
-            variableNode v(VAL_BOOL,$4.val_flag,$2.name,true);
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-            
-        }
-        else if($4.val_type == VAL_FLOAT)
-        {
-            variableNode v(VAL_FLOAT,$4.val_float,$2.name,true);
+            variableNode v(VAL_FLOAT,$5.val_float,$2.name,true);
             if(!myTable.var_declare(v))
             {
                 yyerror(declareErr);
@@ -185,15 +186,16 @@ constant_declared:
         }
         Trace("LET ID '=' standard_data_type reducing to constant_declared\n");
     }|
-    LET ID ':' standard_data_type '=' expression         
+    LET ID ':' standard_data_type '='{constDeclar = 1;} expression         
     {
-        if($4.val_type != $6.val_type)
+        constDeclar = 0;
+        if($4.val_type != $7.val_type)
         {
             yyerror(declareErr);
         }
         if($4.val_type == VAL_INT)
         {
-            variableNode v(VAL_INT,$6.val_int,$2.name,true);
+            variableNode v(VAL_INT,$7.val_int,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -202,7 +204,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_BOOL)
         {
-            variableNode v(VAL_BOOL,$6.val_flag,$2.name,true);
+            variableNode v(VAL_BOOL,$7.val_flag,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -211,7 +213,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_STR)
         {
-            variableNode v(VAL_STR,$6.val_str,$2.name,true);
+            variableNode v(VAL_STR,$7.val_str,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -220,7 +222,7 @@ constant_declared:
         }
         else if($4.val_type == VAL_FLOAT)
         {
-            variableNode v(VAL_FLOAT,$6.val_float,$2.name,true);
+            variableNode v(VAL_FLOAT,$7.val_float,$2.name,true);
 
             if(!myTable.var_declare(v))
             {
@@ -234,32 +236,67 @@ constant_declared:
     };
 
 Variable_declared:
-    LET MUT ID '=' expression
-    {
-        if($5.val_type == VAL_INT)
-        {
-            variableNode v(VAL_INT,$5.val_int,$3.name,false);
 
-            if(!myTable.var_declare(v))
+    LET MUT ID '=' INT
+    {
+
+        variableNode v(VAL_INT,$5.val_int,$3.name,false);
+
+        if(!myTable.var_declare(v))
+        {
+            yyerror(declareErr);
+        }
+        Trace("LET MUT ID '=' FLOAT reducing to Variable_declared\n");
+        if(myTable.checkGlobal())
+            fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, $5.val_int);
+        else
+        {
+            variableNode *w = myTable.lookupVar_for_index($3.name);
+            if(w == NULL)
             {
                 yyerror(declareErr);
             }
-            Trace("LET MUT ID '=' FLOAT reducing to Variable_declared\n");
-            if(myTable.checkGlobal())
-                fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, $5.val_int);
-            else
-            {
-                variableNode *w = myTable.lookupVar_for_index($3.name);
-                if(w == NULL)
-                {
-                    yyerror(declareErr);
-                }
-                fprintf(myJavaCode, "\t\tsipush %d\n",$5.val_int);
-                fprintf(myJavaCode, "\t\tistore %d\n",w->index);
-            }
-
+            fprintf(myJavaCode, "\t\tsipush %d\n",$5.val_int);
+            fprintf(myJavaCode, "\t\tistore %d\n",w->index);
         }
-        else if($5.val_type == VAL_STR)
+
+    }|
+    LET MUT ID '=' BOOL
+    {
+
+        variableNode v(VAL_BOOL,$5.val_flag,$3.name,false);
+
+        if(!myTable.var_declare(v))
+        {
+            yyerror(declareErr);
+        }
+        if(myTable.checkGlobal()){
+            if($5.val_flag == false)
+                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 0);
+            else
+                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 1);
+        }
+        else
+        {
+            
+            variableNode *w = myTable.lookupVar_for_index($3.name);
+            if(w == NULL)
+            {
+                yyerror(declareErr);
+            }
+            if($5.val_flag == false)
+                fprintf(myJavaCode, "\t\tsipush %d\n",0);
+            else
+                fprintf(myJavaCode, "\t\tsipush %d\n",1);
+            fprintf(myJavaCode, "\t\tistore %d\n",w->index);
+        
+        }
+        
+    }|
+    LET MUT ID '=' STR
+    {
+       
+        if($5.val_type == VAL_STR)
         {
             variableNode v(VAL_STR,$5.val_str,$3.name,false);
 
@@ -277,124 +314,93 @@ Variable_declared:
                 yyerror(declareErr);
             }
         }
-        else if($5.val_type == VAL_BOOL)
-        {
-            variableNode v(VAL_BOOL,$5.val_flag,$3.name,false);
 
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-            if(myTable.checkGlobal()){
-                if($5.val_flag == false)
-                    fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 0);
-                else
-                    fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 1);
-            }
-            else
-            {
-                
-                variableNode *w = myTable.lookupVar_for_index($3.name);
-                if(w == NULL)
-                {
-                    yyerror(declareErr);
-                }
-                if($5.val_flag == false)
-                    fprintf(myJavaCode, "\t\tsipush %d\n",0);
-                else
-                    fprintf(myJavaCode, "\t\tsipush %d\n",1);
-                fprintf(myJavaCode, "\t\tistore %d\n",w->index);
-            
-            }
-        }
-        else{
-            yyerror(declareErr);
-        }
         Trace("LET MUT ID '=' standard_data reducing to Variable_declared\n");
     }|
-    LET MUT ID ':' standard_data_type '=' standard_data        
+    LET MUT ID ':' standard_data_type '=' INT        
     {
         if($5.val_type != $7.val_type)
             yyerror(declareErr);
 
-        if($5.val_type == VAL_INT)
+        variableNode v(VAL_INT,$7.val_int,$3.name,false);
+
+        if(!myTable.var_declare(v))
         {
-            variableNode v(VAL_INT,$7.val_int,$3.name,false);
-
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-            if(myTable.checkGlobal())
-                fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, $7.val_int);
-            else
-            {
-                variableNode *w = myTable.lookupVar_for_index($3.name);
-                if(w == NULL)
-                {
-                    yyerror(declareErr);
-                }
-                fprintf(myJavaCode, "\t\tsipush %d\n",$7.val_int);
-                fprintf(myJavaCode, "\t\tistore %d\n",w->index);
-            }
-        }
-        else if($5.val_type == VAL_STR)
-        {
-            variableNode v(VAL_STR,$7.val_str,$3.name,false);
-
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-        }
-        else if($5.val_type == VAL_FLOAT)
-        {
-            variableNode v(VAL_FLOAT,$7.val_float,$3.name,false);
-
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-        }
-        else if($5.val_type == VAL_BOOL)
-        {
-
-
-            variableNode v(VAL_BOOL,$7.val_flag,$3.name,false);
-
-            if(!myTable.var_declare(v))
-            {
-                yyerror(declareErr);
-            }
-            if(myTable.checkGlobal()){
-                printf("%d\n\n\n",$7.val_flag);
-                if($7.val_flag == false)
-                {
-                    fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 0);
-                }
-                else{
-                    fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 1);
-                }
-                    
-            }
-            else
-            {
-                variableNode *w = myTable.lookupVar_for_index($3.name);
-                if(w == NULL)
-                {
-                    yyerror(declareErr);
-                }
-                if($7.val_flag == false)
-                    fprintf(myJavaCode, "\t\tsipush %d\n",0);
-                else
-                    fprintf(myJavaCode, "\t\tsipush %d\n",1);
-                fprintf(myJavaCode, "\t\tistore %d\n",w->index);
-            }
-        }
-        else{
             yyerror(declareErr);
         }
-        Trace("LET MUT ID ':' standard_data_type '=' standard_data reducing to Variable_declared\n");
+        if(myTable.checkGlobal())
+            fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, $7.val_int);
+        else
+        {
+            variableNode *w = myTable.lookupVar_for_index($3.name);
+            if(w == NULL)
+            {
+                yyerror(declareErr);
+            }
+            fprintf(myJavaCode, "\t\tsipush %d\n",$7.val_int);
+            fprintf(myJavaCode, "\t\tistore %d\n",w->index);
+        }
+    }
+
+    LET MUT ID ':' standard_data_type '=' STR        
+    {
+        if($5.val_type != $7.val_type)
+            yyerror(declareErr);
+
+        variableNode v(VAL_STR,$7.val_str,$3.name,false);
+
+        if(!myTable.var_declare(v))
+        {
+            yyerror(declareErr);
+        }
+    }|
+    LET MUT ID ':' standard_data_type '=' FLOAT        
+    {
+        if($5.val_type != $7.val_type)
+            yyerror(declareErr);
+
+        variableNode v(VAL_FLOAT,$7.val_float,$3.name,false);
+
+        if(!myTable.var_declare(v))
+        {
+            yyerror(declareErr);
+        }
+    }|
+    LET MUT ID ':' standard_data_type '=' BOOL        
+    {
+        if($5.val_type != $7.val_type)
+            yyerror(declareErr);
+
+        variableNode v(VAL_BOOL,$7.val_flag,$3.name,false);
+
+        if(!myTable.var_declare(v))
+        {
+            yyerror(declareErr);
+        }
+        if(myTable.checkGlobal()){
+            printf("%d\n\n\n",$7.val_flag);
+            if($7.val_flag == false)
+            {
+                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 0);
+            }
+            else{
+                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 1);
+            }
+                
+        }
+        else
+        {
+            variableNode *w = myTable.lookupVar_for_index($3.name);
+            if(w == NULL)
+            {
+                yyerror(declareErr);
+            }
+            if($7.val_flag == false)
+                fprintf(myJavaCode, "\t\tsipush %d\n",0);
+            else
+                fprintf(myJavaCode, "\t\tsipush %d\n",1);
+            fprintf(myJavaCode, "\t\tistore %d\n",w->index);
+        }
     }|
     LET MUT ID                        
     {
@@ -510,29 +516,40 @@ standard_data:
         $$.val_type =  VAL_INT;$$.val_int = $1.val_int; 
         Trace("INT reducing to standard_data\n");
         
-        //fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_int);
+        if((!myTable.checkGlobal()) && constDeclar==0)
+            fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_int);
+        
     } |
     BOOL 
     {
         $$.val_type = VAL_BOOL;$$.val_flag = $1.val_flag; 
         Trace("BOOL reducing to standard_data\n");
-
-        //    if($$.val_flag)    
-        //      fprintf(myJavaCode, "\t\tsipush %d\n", 1);
-        //   else        
-        //      fprintf(myJavaCode, "\t\tsipush %d\n", 0);
+        
+        if((!myTable.checkGlobal()) && constDeclar==0)
+        {
+            if($$.val_flag)    
+                fprintf(myJavaCode, "\t\iconst_1 %d\n", 1);
+            else        
+                fprintf(myJavaCode, "\t\iconst_0 %d\n", 0);
+        }    
     } |
     STR   
     {
         $$.val_type = VAL_STR;$$.val_str = $1.val_str;
         Trace("STR reducing to standard_data\n");
-        //fprintf(myJavaCode, "\t\tldc \"%s\" \n", $1.val_str);
+
+        if((!myTable.checkGlobal()) && constDeclar==0)
+            fprintf(myJavaCode, "\t\tldc \"%s\" \n", $1.val_str);
      } |
     FLOAT 
     {
         $$.val_type = VAL_FLOAT;$$.val_float = $1.val_float; 
+        if((!myTable.checkGlobal()) && constDeclar==0)
+        {
+            fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_float);
+        }
+
         Trace("FLOAT reducing to standard_data\n");
-        //fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_float);
     };
 
 formal_argment:
@@ -749,7 +766,7 @@ func_declared:
             else if($7.val_type == VAL_BOOL)
                 fprintf(myJavaCode,"\tmethod public static boolean %s()\n\tmax_stack 15\n\tmax_locals 15\n\t{\n", $2.name);
             else if($7.val_type == VAL_STR)
-                fprintf(myJavaCode,"\tmethod public static string %s()\n\tmax_stack 30\n\tmax_locals 15\n\t{\n", $2.name);
+                fprintf(myJavaCode,"\tmethod public static string %s()\n\tmax_stack 15\n\tmax_locals 15\n\t{\n", $2.name);
         }
         Trace("FN ID '(' ')' func_sign standard_data_type reducing to func_declared\n");
     } func_block 
@@ -760,6 +777,14 @@ func_declared:
 simple_state:
     ID '=' bool_exp ';'
     {
+        variableNode *v = myTable.lookupVar($1.name);
+        if(v->isGlobal)
+        {
+            fprintf(myJavaCode,"\t\tputstatic int Project.%s\n", $1.name);
+        }
+        else{
+            fprintf(myJavaCode, "\t\tistore %d\n", v->index);
+        }
         if($3.val_type == VAL_INT)
         {
             variableNode v($3.val_type,$3.val_int,$1.name,true);
@@ -930,6 +955,41 @@ object:ID
         
         else 
             yyerror(errWord);
+
+
+        if(v->is_const)
+        {
+            if(v->val_Type == VAL_INT)
+                fprintf(myJavaCode,"\t\tsipush %d\n", v->data.val_int); 
+            else if(v->val_Type == VAL_BOOL){
+                if(v->data.val_flag)
+                    fprintf(myJavaCode,"\t\ticonst_1%s\n");
+                else
+                    fprintf(myJavaCode,"\t\ticonst_0%s\n");
+            }   
+            else if(v->val_Type == VAL_FLOAT)
+                fprintf(myJavaCode,"\t\tsipush %d\n", v->data.val_int); 
+            else if(v->val_Type == VAL_STR)
+                fprintf(myJavaCode,"\t\tldc \"%s\"\n", v->data.val_str); 
+        }
+        else
+        {
+            if(v->isGlobal)
+            {
+                if(v->val_Type == VAL_INT)
+                    fprintf(myJavaCode,"\t\tgetstatic int Project.%s\n", $1.name);
+                else if(v->val_Type == VAL_BOOL)            
+                    fprintf(myJavaCode,"\t\tgetstatic bool Project.%s\n", $1.name);
+                else if(v->val_Type == VAL_FLOAT)
+                    fprintf(myJavaCode,"\t\tgetstatic float Project.%s\n", $1.name);
+                else if(v->val_Type == VAL_STR)
+                    fprintf(myJavaCode,"\t\tgetstatic str Project.%s\n", $1.name);
+            }
+            else
+            {
+                fprintf(myJavaCode,"\t\tiload %d\n", v->index);
+            }
+        }
     }
     else{
         strcpy(errWord,"can not find variable"); 
@@ -947,22 +1007,13 @@ expression:
     expression '*' expression
     {
         strcpy(errWord,"type error");
-        if($1.val_type != $3.val_type)
+        if($1.val_type != $3.val_type){
             yyerror(errWord);
-        if($1.val_type != VAL_INT && $1.val_type != VAL_FLOAT)
-            yyerror(errWord);
-        if($1.val_type == VAL_INT)
-        {
-            $$.val_type = $1.val_type;
-            $$.val_int = $1.val_int * $3.val_int;
-        }
-        else if($1.val_type == VAL_FLOAT)
-        {
-            $$.val_type = $1.val_type;
-            $$.val_float = $1.val_float * $3.val_float;
         }
         else 
             yyerror(errWord);
+        
+        fprintf(myJavaCode, "\t\timul\n");
     }|
     expression '/' expression
     {
@@ -993,6 +1044,8 @@ expression:
         }
         else 
             yyerror(errWord);
+        
+        fprintf(myJavaCode, "\t\tidiv\n");
     }|
     expression '+' expression
     {
@@ -1013,6 +1066,9 @@ expression:
         }
         else 
             yyerror(errWord);
+
+        
+        fprintf(myJavaCode, "\t\tiadd\n");
     }|
     expression '-' expression
     {
@@ -1032,6 +1088,8 @@ expression:
         }
         else 
             yyerror(errWord);
+        
+        fprintf(myJavaCode, "\t\tisub\n");
     };
 
 
@@ -1077,7 +1135,7 @@ int main(int argc, char const *argv[])
     //    exit(1);
     //}
     myJavaCode = fopen("Will.jasm", "w");         /* open input file */
-    fprintf(myJavaCode,"class proj3\n{\n");
+    fprintf(myJavaCode,"class Project\n{\n");
     /* perform parsing */
     if (yyparse() == 1) 
                     /* parsing */

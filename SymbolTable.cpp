@@ -136,8 +136,13 @@ int symTable::var_declare(variableNode v)
     variableNode* sameArr = lookupVar_for_declare(v.name);
     if(sameArr == NULL)
     {
-
-        v.index = stackIndex++;
+        if(checkGlobal())
+        {
+            v.isGlobal = 1;
+            v.index = 0;
+        }
+        else
+            v.index = stackIndex++;
         myTable.back().varNode.push_back(v);
         std::cout << "--------------------------------------------\n"<<"PUSH variable => name = "<< v.name<<" index = "<<v.index<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;

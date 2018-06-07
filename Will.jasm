@@ -1,22 +1,9 @@
-class proj3
+class Project
 {
-	field static bool a = 0
-	field static bool b = 0
-	field static int c
 	method public static int add(int, int)
 	max_stack 15
 	max_locals 15
 	{
-		sipush 1
-		istore 2
-		sipush 0
-		istore 3
-	}
-	method public static int add(int, int)
-	max_stack 15
-	max_locals 15
-	{
-		sipush 5
-		istore 0
+		ldc "aaa"
 	}
 }
