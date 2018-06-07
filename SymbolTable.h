@@ -96,6 +96,7 @@ public:
   //  ~symTable();
     variableNode *lookupVar(char *name);
     variableNode *lookupVar_for_declare(char *name);
+    variableNode *lookupVar_for_index(char *name);
     variableNode *lookupFunc(char *name);
     arrayNode *lookupArr(char *name);
     int var_declare(variableNode v);

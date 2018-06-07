@@ -139,7 +139,7 @@ int symTable::var_declare(variableNode v)
 
         v.index = stackIndex++;
         myTable.back().varNode.push_back(v);
-        std::cout << "--------------------------------------------\n"<<"PUSH variable => name = "<< v.name<<std::endl<<"--------------------------------------------"<<std::endl;  
+        std::cout << "--------------------------------------------\n"<<"PUSH variable => name = "<< v.name<<" index = "<<v.index<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;
     }
     else{
@@ -171,7 +171,6 @@ int symTable::func_declare(variableNode v)
     if(sameArr == NULL)
     {
         myFunc.push_back(v);
-        stackIndex = 0;
         //dumpTable();   
         std::cout <<"--------------------------------------------\n"<< "PUSH function => name = "<< v.name<<std::endl<<"--------------------------------------------"<<std::endl;  
         return 1;
@@ -224,6 +223,7 @@ int symTable::array_declare(int type,int num,char* vName)
     else if(a.val_Type == VAL_BOOL)
     {
         for(int i =0;i<num;i++)
+            a.index = stackIndex++;
             a.array.arr_float.push_back(true);
     }
     
@@ -238,7 +238,7 @@ int symTable::dumpTable(){
     std::vector<variableNode>::iterator funcBegin;
     std::vector<arrayNode>::iterator arrBegin;
     
-    std::cout<<"------------2222--------------------------------"<<std::endl;
+    std::cout<<"--------------------------------------------"<<std::endl;
     for(funcBegin = myFunc.begin();funcBegin!= myFunc.end();funcBegin++)
     {
         std::cout << "Function => name = ";
@@ -372,6 +372,26 @@ variableNode *symTable::lookupVar_for_declare(char *name)
 
 }
 
+variableNode *symTable::lookupVar_for_index(char *name)
+{
+    std::vector<tableNode>::iterator tableBegin = myTable.end()-1;
+
+    std::vector<variableNode>::iterator variableBegin;
+    if(tableBegin->varNode.size() !=0){
+        for(variableBegin = tableBegin->varNode.begin();variableBegin!=tableBegin->varNode.end();variableBegin++)
+        {
+            if(!strcmp(variableBegin->name, name))
+            {
+                return  (&*variableBegin);
+            }
+        }
+    }
+        
+    return NULL;
+
+}
+
+
 variableNode *symTable::lookupFunc(char *name)
 {
 
@@ -409,9 +429,11 @@ int symTable::checkGlobal()
 }
 void symTable::pushTable()
 {    
-    if(myTable.size() == 1){
-        stackIndex = 1;
-    }
+    // if(myTable.size() == 1){
+    //     stackIndex = 1;
+    // }
+
+    stackIndex = 0;
     myTable.push_back(tableNode());
 }
 void symTable::popTable()

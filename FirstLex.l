@@ -75,7 +75,7 @@ char strBuf[MAX_LINE_LENG];
 "else" {token(ELSE);}
 "enum" {token(ENUM);}
 "extern" {token(EXTERN);}
-"false" {yylval.Data.val_flag = FALSE; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
+"false" {yylval.Data.val_flag = false; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
 "float" {token(FLOAT);}
 "for" {token(FOR);}
 "fn" {token(FN);}
@@ -93,7 +93,7 @@ char strBuf[MAX_LINE_LENG];
 "static" {token(STATIC);}
 "str" {token(STR);}
 "struct" {token(STRUCT);}
-"true" {yylval.Data.val_flag = TRUE; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
+"true" {yylval.Data.val_flag = true; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
 "use" {token(USE);}
 "where" {token(WHERE);}
 "while" {token(WHILE);}

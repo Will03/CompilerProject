@@ -1,0 +1,14 @@
+let mut a = false;
+let mut b:bool = false;
+let mut c;
+fn add(a:int, b:int) -> int
+{
+   let mut d = true;
+   let mut e:bool = false;
+}
+
+fn add(a:int, b:int) -> int
+{
+  let mut a = 5;
+  return a+b;
+}

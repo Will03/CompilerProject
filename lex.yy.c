@@ -1062,7 +1062,7 @@ YY_RULE_SETUP
 case 40:
 YY_RULE_SETUP
 #line 78 "FirstLex.l"
-{yylval.Data.val_flag = FALSE; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
+{yylval.Data.val_flag = false; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
@@ -1152,7 +1152,7 @@ YY_RULE_SETUP
 case 58:
 YY_RULE_SETUP
 #line 96 "FirstLex.l"
-{yylval.Data.val_flag = TRUE; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
+{yylval.Data.val_flag = true; yylval.Data.val_type = VAL_BOOL;token(BOOL);}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP

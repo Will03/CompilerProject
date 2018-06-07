@@ -1,32 +1,22 @@
 class proj3
 {
-		sipush 5
-		sipush 3243
-		sipush 3
-		sipush 3
-	method public static void add (int, int)
+	field static bool a = 0
+	field static bool b = 0
+	field static int c
+	method public static int add(int, int)
 	max_stack 15
 	max_locals 15
 	{
+		sipush 1
+		istore 2
+		sipush 0
+		istore 3
 	}
-	method public static void main(java.lang.String[])
+	method public static int add(int, int)
 	max_stack 15
 	max_locals 15
 	{
-		sipush 10
-		sipush 10
-		sipush 0
-		sipush 2
-		sipush 1
-		sipush 43
-		sipush 2
-		sipush 88
-		sipush 0
-		sipush goodd
-		sipush 1
-		sipush good
-		sipush 2
-		sipush hell
-		sipush Hello World
+		sipush 5
+		istore 0
 	}
 }

@@ -4,15 +4,29 @@
 
 // variables
 let mut c;
-let mut a = 5 + 3243;
-let mut myInt[int,3];
-let mut myString[str,3];
+let mut a = 5;
+//let mut myInt[int,3];
+//let mut myString[str,3];
 // function declaration
-fn add(a:int, b:int)
+fn add(a:int, b:int) -> int
 {
-  //return a+b;
+  let mut c = 5;
+  return a+b;
 }
-    
+fn add1(a:int, b:int)
+{
+  let mut c = 3;
+  return a+b;
+}
+fn add2()
+{
+let mut a = 1;
+}
+fn add2()-> int
+{
+
+}       
+
 // main function
 fn main() 
 {
