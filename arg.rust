@@ -1,0 +1,9 @@
+fn add1(a:bool, b:int,c:int)
+{
+  return a;
+}
+fn main() 
+{
+    let mut c = 3;
+    c = add1(true, 10,11);
+}

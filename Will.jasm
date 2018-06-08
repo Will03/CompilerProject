@@ -1,27 +1,24 @@
 class Project
 {
+	method public static void add1(boolean, int, int)
+	max_stack 15
+	max_locals 15
+	{
+		iload 0
+		ireturn
+		return
+	}
 	method public static void main(java.lang.String[])
 	max_stack 15
 	max_locals 15
 	{
-		sipush 1
+		sipush 3
 		istore 0
-	L0:
-		iload 0
-		sipush 10
-		isub
-		ifle L4
-		iconst_0
-		goto L5
-	L4:
 		iconst_1
-	L5:
-		ifeq L3
-		iload 0
-		sipush 1
-		iadd
+		sipush 10
+		sipush 11
+		invokestatic void Project.add1(bool,int,int)
 		istore 0
-		goto L1
-	L3:
+		return
 	}
 }

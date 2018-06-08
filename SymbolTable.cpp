@@ -405,7 +405,8 @@ variableNode *symTable::lookupFunc(char *name)
     if(myFunc.size() !=0){
         for(;funcBegin!=myFunc.end();funcBegin++)
         {
-            if(funcBegin->name == name)
+            //printf("%s %s\n",funcBegin->name,name);
+            if(!strcmp(funcBegin->name,name))
             {
                 return  (&*funcBegin);
             }
@@ -500,4 +501,70 @@ void symTable::popTable()
         std::cout << "Nothing pop"<<std::endl;
     std::cout<<"-----------------------------------------"<<std::endl;
     myTable.pop_back();
+}
+int symTable::func_var_store(char *name,int type)
+{
+    argNode a;
+    a.name = name;
+    a.val_Type = type;
+    myFunc.back().argVar.push_back(a);
+    return 0;
+}
+int symTable::func_type_check(char *name,char *argVar)
+{
+
+
+    variableNode *v =  lookupFunc(name);
+    std::vector<char> newArg;
+    if(v == NULL)
+    {
+        return 0;
+    } 
+    printf("\n%s\n",argVar);
+    char s[6];
+    char* tok = strtok (argVar, ",");
+    while(tok!=NULL)
+    {
+        printf("%s",tok);
+        strcpy(s,tok);
+        newArg.push_back(atoi(s));
+        tok = strtok (NULL, ",");
+        if(tok ==NULL )break;
+    }
+
+    if(newArg.size()!= v->argVar.size())
+        return 0;
+    printf("%d %d",newArg.size(),v->argVar.size());
+    for(int i =0;i < v->argVar.size();i++)
+    {
+        printf("%d %d",v->argVar[i].val_Type,newArg[i]);
+        if(v->argVar[i].val_Type !=( newArg[i]))
+        {
+            printf("arg type not match\n");
+            return 0;
+        }
+
+    }
+    return 1;
+
+}
+char *symTable::func_type_combine(variableNode *v)
+{
+    char *func_type_str = new char(100);
+    for(int i =0;i<100;i++)
+        func_type_str[i] = 0;
+    for(int i =  0; i < v->argVar.size(); i++){
+        
+        //check name and type and const;
+        if(v->argVar[i].val_Type == VAL_INT)
+            strcat(func_type_str,"int");
+        else if(v->argVar[i].val_Type == VAL_BOOL)
+            strcat(func_type_str,"bool");
+        else if(v->argVar[i].val_Type == VAL_STR)
+            strcat(func_type_str,"str");
+        
+        if(i < v->argVar.size()-1)
+            strcat(func_type_str,",");
+    }
+    return(func_type_str);
 }

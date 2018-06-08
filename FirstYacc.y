@@ -30,6 +30,7 @@ FILE *myJavaCode;
             int  val_int;
             bool val_flag;
             float val_float;
+            char *arg_var_type;
         };
         char* concat_name;
         // if it is an array element it should be store the index
@@ -56,7 +57,7 @@ FILE *myJavaCode;
 %type<Data> statement
 %type<Data> bool_exp
 %type<Data> func_invoke
-
+%type<Data> func_arg
 
 /* tokens */
 %token SEMICOLON
@@ -549,7 +550,7 @@ standard_data:
         $$.val_type = VAL_FLOAT;$$.val_float = $1.val_float; 
         if((!myTable.checkGlobal()) && constDeclar==0)
         {
-            fprintf(myJavaCode, "\t\tsipush %d\n", $1.val_float);
+            fprintf(myJavaCode, "\t\tsipush %f\n", $1.val_float);
         }
 
         Trace("FLOAT reducing to standard_data\n");
@@ -616,14 +617,16 @@ formal_arguments:
 func_block:
     '{' '}' {
         Trace("'{' '}' reducing to block\n");
-        fprintf(myJavaCode,"\t}\n");
+        myTable.popTable();
+        Trace("delete table\n");
+        //fprintf(myJavaCode,"\t}\n");
     }|
     '{' statements '}' {
         //myTable.dumpTable();
         myTable.popTable();
         Trace("delete table\n");
         Trace("ID '(' statements ')' reducing to block\n");
-        fprintf(myJavaCode,"\t}\n");
+        //fprintf(myJavaCode,"\t}\n");
     };
 
 func_sign:
@@ -662,6 +665,7 @@ func_declared:
                     fprintf(myJavaCode,"srting");
                 }
  
+                myTable.func_var_store(target->name,target->val_Type);
             }
             else
                 break;
@@ -671,7 +675,9 @@ func_declared:
         fprintf(myJavaCode,")\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
         Trace("FN ID '(' formal_arguments ')' reducing to func_declared\n");
 
-    } func_block
+    } func_block{
+        fprintf(myJavaCode,"\t\treturn\n\t}\n");
+        }
     |
     
     func_sign ID '(' ')' {
@@ -688,7 +694,7 @@ func_declared:
         }
 
         Trace("FN ID '(' ')' reducing to func_declared\n");
-    } func_block
+    } func_block{fprintf(myJavaCode,"\t\treturn\n\t}\n");}
      |
      
     func_sign ID '(' formal_arguments ')' '-' '>'  standard_data_type
@@ -735,6 +741,7 @@ func_declared:
                     fprintf(myJavaCode,"srting");
                 }
  
+                myTable.func_var_store(target->name,target->val_Type);
             }
             else
                 break;
@@ -744,7 +751,7 @@ func_declared:
         fprintf(myJavaCode,")\n\tmax_stack 15\n\tmax_locals 15\n\t{\n");
  
         Trace("FN ID '(' formal_arguments ')' func_sign standard_data_type reducing to func_declared\n");
-    } func_block
+    } func_block {fprintf(myJavaCode,"\n\t}\n");}
     |
     
     func_sign ID '(' ')'  '-' '>' standard_data_type
@@ -772,7 +779,7 @@ func_declared:
                 fprintf(myJavaCode,"\tmethod public static string %s()\n\tmax_stack 15\n\tmax_locals 15\n\t{\n", $2.name);
         }
         Trace("FN ID '(' ')' func_sign standard_data_type reducing to func_declared\n");
-    } func_block 
+    } func_block {fprintf(myJavaCode,"\n\t}\n");}
     ;
     
 
@@ -876,10 +883,12 @@ simple_state:
     }|
     RETURN ';'
     {
+        fprintf(myJavaCode,"\t\tireturn\n");
         Trace("RETURN ';' reducing to simple_state\n");
     }|
     RETURN expression ';' 
     {
+        fprintf(myJavaCode,"\t\tireturn\n");
         Trace("RETURN expression ';'  reducing to simple_state\n");
     };
 
@@ -888,20 +897,62 @@ simple_state:
 func_arg:
     expression ',' func_arg
     {
+        $$.arg_var_type = (char*)malloc(2*sizeof(char)); 
+        sprintf($$.arg_var_type, "%d", $1.val_type);
+        strcat($$.arg_var_type, ",");
+        strcat($$.arg_var_type, $3.arg_var_type);
         Trace("expression ',' func_arg  reducing to func_arg\n");
     }|
     expression
     {
+        $$.arg_var_type = (char*)malloc(2*sizeof(char)); 
+        sprintf($$.arg_var_type, "%d", $1.val_type);
         Trace("expression reducing to func_arg\n");
     };
 
 func_invoke:
     ID  '(' func_arg ')' 
     {
+        strcpy(errWord ,"arg error");
+        variableNode *v =  myTable.lookupFunc($$.name);
+        if(v == NULL)
+            yyerror(errWord);
+
+        if(!myTable.func_type_check($1.name, $3.arg_var_type))
+            yyerror(errWord);
+        printf("sssssssssssssssss");
+        char *ty;
+        if(v->val_Type == VAL_INT)
+            ty = strdup("int");
+        else if(v->val_Type == VAL_BOOL)
+            ty = strdup("bool");
+        else if(v->val_Type == VAL_STR)
+            ty = strdup("str");
+        else if(v->val_Type == VAL_NULL)
+            ty = strdup("void");
+
+        
+        fprintf(myJavaCode,"\t\tinvokestatic %s Project.%s(%s)\n", ty,v->name,myTable.func_type_combine(v));
         Trace("ID  '(' func_arg ')' reducing to func_invoke\n");
     }|
     ID '(' ')'
     {
+        strcpy(errWord ,"arg error");
+        variableNode *v =  myTable.lookupFunc($$.name);
+        if(v == NULL)
+            yyerror(errWord);
+        
+        if(!myTable.func_type_check($1.name,strdup("")))
+            yyerror(errWord);
+        char *ty;
+        if(v->val_Type == VAL_INT)
+            ty = strdup("int");
+        else if(v->val_Type == VAL_BOOL)
+            ty = strdup("bool");
+        else if(v->val_Type == VAL_STR)
+            ty = strdup("str");
+
+        fprintf(myJavaCode,"\t\tinvokestatic %s Project.%s()\n", ty,v->name);
         Trace("ID '(' ')' reducing to func_invoke\n");
     };
 

@@ -22,7 +22,7 @@ fn add2()
 {
 let mut a = 1;
 }
-fn add2()-> int
+fn add2(cc:int,dd:bool)-> int
 {
 
 }       

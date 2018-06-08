@@ -30,7 +30,10 @@ struct arrayNode{
 	int index;
     int isGlobal;
 };
-
+struct argNode{
+    int val_Type; 
+    char *name;
+};
 
 //create variable struct
 struct variableNode{
@@ -41,7 +44,7 @@ struct variableNode{
     bool is_const;
 	int index;
     int isGlobal;
-
+    std::vector<argNode> argVar;
     //for int
     variableNode(int type,int value, char* vName,bool v_const){
         data.val_int = value;
@@ -101,6 +104,9 @@ public:
     arrayNode *lookupArr(char *name);
     int var_declare(variableNode v);
     int func_declare(variableNode v);
+    int func_var_store(char *name,int type);
+    int func_type_check(char *name,char *argVar);
+    char *func_type_combine(variableNode *v);
     int array_declare(int type,int num,char* vName);
     int assignArr(int index,variableNode v);
     int assignVal(variableNode v);

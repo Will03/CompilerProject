@@ -158,6 +158,7 @@ union YYSTYPE
             int  val_int;
             bool val_flag;
             float val_float;
+            char *arg_var_type;
         };
         char* concat_name;
         // if it is an array element it should be store the index
@@ -168,7 +169,7 @@ union YYSTYPE
         int state; 
     }Data;
 
-#line 172 "y.tab.h" /* yacc.c:1909  */
+#line 173 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
