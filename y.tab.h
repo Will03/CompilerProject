@@ -146,7 +146,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 19 "FirstYacc.y" /* yacc.c:1909  */
+#line 22 "FirstYacc.y" /* yacc.c:1909  */
 
     struct
     {
@@ -162,7 +162,7 @@ union YYSTYPE
         char* concat_name;
         // if it is an array element it should be store the index
         int arr_idx;
-        // int => 0 = T_INT bool => 1 = T_BOOL string => 3 = T_STR real => 3 = T_REAL
+        // int => 0 = T_INT bool => 1 = VAL_BOOL string => 3 = T_STR real => 3 = T_REAL
         int val_type;
         //0 => id || 1 => primitive type for passing data by $$ to recognize
         int state; 

@@ -1,0 +1,8 @@
+
+let r = 500;
+fn add(a:int, b:int) -> int
+{
+  let c = "aaa";
+  r = 1;
+  print c;
+}

@@ -8,6 +8,9 @@
 extern int yyerror(char *s);
 int yylex();
 symTable myTable;
+int labelNum = 0;
+int labelStackTop = 0;
+int labelStack[20];
 int funcArgSize;
 int constDeclar;
 char errWord[256];
@@ -31,7 +34,7 @@ FILE *myJavaCode;
         char* concat_name;
         // if it is an array element it should be store the index
         int arr_idx;
-        // int => 0 = T_INT bool => 1 = T_BOOL string => 3 = T_STR real => 3 = T_REAL
+        // int => 0 = T_INT bool => 1 = VAL_BOOL string => 3 = T_STR real => 3 = T_REAL
         int val_type;
         //0 => id || 1 => primitive type for passing data by $$ to recognize
         int state; 
@@ -528,9 +531,9 @@ standard_data:
         if((!myTable.checkGlobal()) && constDeclar==0)
         {
             if($$.val_flag)    
-                fprintf(myJavaCode, "\t\iconst_1 %d\n", 1);
+                fprintf(myJavaCode, "\t\ticonst_1\n");
             else        
-                fprintf(myJavaCode, "\t\iconst_0 %d\n", 0);
+                fprintf(myJavaCode, "\t\ticonst_0\n");
         }    
     } |
     STR   
@@ -788,22 +791,38 @@ simple_state:
         if($3.val_type == VAL_INT)
         {
             variableNode v($3.val_type,$3.val_int,$1.name,true);
-            myTable.assignVal(v);
+            if(!myTable.assignVal(v))
+            {
+                strcpy(errWord,"assign wrong\0");
+                yyerror(errWord);
+            }
         }
         else if($3.val_type == VAL_FLOAT)
         {
             variableNode v($3.val_type,$3.val_float,$1.name,true);
-            myTable.assignVal(v);
+            if(!myTable.assignVal(v))
+            {
+                strcpy(errWord,"assign wrong\0");
+                yyerror(errWord);
+            }
         }
         else if($3.val_type == VAL_STR)
         {
             variableNode v($3.val_type,$3.val_str,$1.name,true);
-            myTable.assignVal(v);
+            if(!myTable.assignVal(v))
+            {
+                strcpy(errWord,"assign wrong\0");
+                yyerror(errWord);
+            }
         }
         else if($3.val_type == VAL_BOOL)
         {
             variableNode v($3.val_type,$3.val_flag,$1.name,true);
-            myTable.assignVal(v);
+            if(!myTable.assignVal(v))
+            {
+                strcpy(errWord,"assign wrong\0");
+                yyerror(errWord);
+            }
         }
         Trace("ID '=' bool_exp ';' reducing to simple_state\n");
     }|
@@ -837,53 +856,21 @@ simple_state:
         }
         Trace("ID '[' expression ']' '=' expression ';' reducing to simple_state\n");
     }|
-    PRINT expression ';'
+    PRINT{fprintf(myJavaCode,"\t\tgetstatic java.io.PrintStream java.lang.System.out\n");}  expression ';'
     {
-        if($2.val_type == VAL_INT)
-        {
-            printf("%d\n",$2.val_int);
-        }
-        else if($2.val_type == VAL_FLOAT)
-        {
-            printf("%f\n",$2.val_float);
-        }
-        else if($2.val_type == VAL_BOOL)
-        {
-            printf("%d\n",$2.val_flag);
-        }
-        else if($2.val_type == VAL_STR)
-        {
-            printf("%s\n",$2.val_str);
-        }
-        else{
-            strcpy(errWord,"print error\n");
-            yyerror(errWord);
-        }
-        
+        if($3.val_type == VAL_STR)
+            fprintf(myJavaCode,"\t\tinvokevirtual void java.io.PrintStream.print(java.lang.String)\n");
+        else
+            fprintf(myJavaCode,"\t\tinvokevirtual void java.io.PrintStream.print(int)\n"); 
+
         Trace("PRINT expression ';' reducing to simple_state\n");
     }|
-    PRINTLN expression ';'
-    {
-        if($2.val_type == VAL_INT)
-        {
-            printf("%d\n",$2.val_int);
-        }
-        else if($2.val_type == VAL_FLOAT)
-        {
-            printf("%f\n",$2.val_float);
-        }
-        else if($2.val_type == VAL_BOOL)
-        {
-            printf("%d\n",$2.val_flag);
-        }
-        else if($2.val_type == VAL_STR)
-        {
-            printf("%s\n",$2.val_str);
-        }
-        else{
-            strcpy(errWord,"print error\n");
-            yyerror(errWord);
-        }
+    PRINTLN{fprintf(myJavaCode,"\t\tgetstatic java.io.PrintStream java.lang.System.out\n");}  expression ';'
+    { 
+        if($3.val_type == VAL_STR)
+            fprintf(myJavaCode,"\t\tinvokevirtual void java.io.PrintStream.println(java.lang.String)\n");
+        else
+            fprintf(myJavaCode,"\t\tinvokevirtual void java.io.PrintStream.println(int)\n"); 
         
         Trace("PRINTLN expression ';' reducing to simple_state\n");
     }|
@@ -963,9 +950,9 @@ object:ID
                 fprintf(myJavaCode,"\t\tsipush %d\n", v->data.val_int); 
             else if(v->val_Type == VAL_BOOL){
                 if(v->data.val_flag)
-                    fprintf(myJavaCode,"\t\ticonst_1%s\n");
+                    fprintf(myJavaCode,"\t\ticonst_1\n");
                 else
-                    fprintf(myJavaCode,"\t\ticonst_0%s\n");
+                    fprintf(myJavaCode,"\t\ticonst_0\n");
             }   
             else if(v->val_Type == VAL_FLOAT)
                 fprintf(myJavaCode,"\t\tsipush %d\n", v->data.val_int); 
@@ -1002,7 +989,7 @@ expression:
     func_invoke{$$ = $1;}|
     object {$$ = $1;}|
     standard_data{$$ = $1;}|
-    '-' expression{$$ = $2;}|
+    '-' expression{$$ = $2;fprintf(myJavaCode, "\t\tineg\n");}|
     '(' expression ')'{$$ = $2;}|
     expression '*' expression
     {
@@ -1090,31 +1077,182 @@ expression:
             yyerror(errWord);
         
         fprintf(myJavaCode, "\t\tisub\n");
+    }|
+    expression '%' expression
+    {
+        strcpy(errWord,"tyep error"); 
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        fprintf(myJavaCode, "\t\tirem\n");
     };
 
 
 bool_exp:
     expression|
     '!' bool_exp {$$ = $2;}|
-    bool_exp '<' bool_exp|
-    bool_exp '>' bool_exp|
-    bool_exp LESS_EQUAL bool_exp|
-    bool_exp GREAT_EQUAL bool_exp|
-    bool_exp EQUAL bool_exp|
-    bool_exp NOT_EQUAL bool_exp|
-    bool_exp AND_DOUBLE bool_exp|
-    bool_exp OR_DOUBLE bool_exp;
+    bool_exp AND_DOUBLE bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tiand\n");
+
+    }| 
+    bool_exp OR_DOUBLE bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tior\n");
+
+    }| 
+    bool_exp '!' bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tixor\n");
+    }| 
+    bool_exp '<' bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tisub\n");
+        fprintf(myJavaCode, "\t\tiflt L%d\n", labelNum);
+        fprintf(myJavaCode, "\t\ticonst_0\n");
+        fprintf(myJavaCode, "\t\tgoto L%d\n",labelNum+1);
+        fprintf(myJavaCode, "\tL%d:\n\t\ticonst_1\n",labelNum);
+        fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
+        labelNum +=2;
+    }|
+
+    bool_exp '>' bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tisub\n");
+        fprintf(myJavaCode, "\t\tifgt L%d\n", labelNum);
+        fprintf(myJavaCode, "\t\ticonst_0\n");
+        fprintf(myJavaCode, "\t\tgoto L%d\n",labelNum+1);
+        fprintf(myJavaCode, "\tL%d:\n\t\ticonst_1\n",labelNum);
+        fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
+        labelNum +=2;
+    }|
+    bool_exp LESS_EQUAL bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tisub\n");
+        fprintf(myJavaCode, "\t\tifle L%d\n", labelNum);
+        fprintf(myJavaCode, "\t\ticonst_0\n");
+        fprintf(myJavaCode, "\t\tgoto L%d\n",labelNum+1);
+        fprintf(myJavaCode, "\tL%d:\n\t\ticonst_1\n",labelNum);
+        fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
+        labelNum +=2;
+    }|
+    bool_exp GREAT_EQUAL bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tisub\n");
+        fprintf(myJavaCode, "\t\tifge L%d\n", labelNum);
+        fprintf(myJavaCode, "\t\ticonst_0\n");
+        fprintf(myJavaCode, "\t\tgoto L%d\n",labelNum+1);
+        fprintf(myJavaCode, "\tL%d:\n\t\ticonst_1\n",labelNum);
+        fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
+        labelNum +=2;
+    }|
+
+    bool_exp EQUAL bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tisub\n");
+        fprintf(myJavaCode, "\t\tifeq L%d\n", labelNum);
+        fprintf(myJavaCode, "\t\ticonst_0\n");
+        fprintf(myJavaCode, "\t\tgoto L%d\n",labelNum+1);
+        fprintf(myJavaCode, "\tL%d:\n\t\t\ticonst_1\n",labelNum);
+        fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
+        labelNum +=2;
+    }|
+    bool_exp NOT_EQUAL bool_exp {
+        strcpy(errWord,"tyep error"); 
+
+        if($1.val_type != $3.val_type)
+            yyerror(errWord);
+        $$ = $1;
+        $$.val_type = VAL_BOOL;
+        fprintf(myJavaCode, "\t\tisub\n");
+        fprintf(myJavaCode, "\t\tifne L%d\n", labelNum);
+        fprintf(myJavaCode, "\t\ticonst_0\n");
+        fprintf(myJavaCode, "\t\tgoto L%d\n",labelNum+1);
+        fprintf(myJavaCode, "\tL%d:\n\t\ticonst_1\n",labelNum);
+        fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
+        labelNum +=2;
+    }
+    ;
 
 
 
+condition_else:
+    block ELSE
+    {
+        fprintf(myJavaCode,"\t\tgoto L%d\n", labelStack[labelStackTop-1] + 1);
+        //else lable
+        fprintf(myJavaCode, "\tL%d:\n", labelStack[labelStackTop - 1]);
+    } block
+    {
+        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop] + 1);
+    }|block
+    {
+        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop]);
+    };
 
 
 condition:
-    IF '(' bool_exp ')' block ELSE block|
-    IF '(' bool_exp ')' block;
+    IF '(' bool_exp ')'
+    {
+        labelStack[labelStackTop++] = labelNum;
+        fprintf(myJavaCode,"\t\tifeq L%d\n", labelNum);
+        labelNum += 2;        
+    } condition_else;
 
 loop:
-    WHILE '(' bool_exp ')' block;
+    WHILE
+    {
+        labelStack[labelStackTop++] = labelNum;
+        fprintf(myJavaCode, "\tL%d:\n", labelNum);
+        labelNum += 4; 
+    } '(' bool_exp ')'
+    {
+            fprintf(myJavaCode,"\t\tifeq L%d\n", labelStack[labelStackTop-1] + 3);
+    } block
+    {
+        fprintf(myJavaCode,"\t\tgoto L%d\n", labelStack[labelStackTop-1] + 1);
+        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop] + 3);
+    };
 
 %%
 
