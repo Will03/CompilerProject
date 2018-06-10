@@ -250,7 +250,7 @@ Variable_declared:
         {
             yyerror(declareErr);
         }
-        Trace("LET MUT ID '=' FLOAT reducing to Variable_declared\n");
+        Trace("LET MUT ID '=' INT reducing to Variable_declared\n");
         if(myTable.checkGlobal())
             fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, $5.val_int);
         else
@@ -344,7 +344,7 @@ Variable_declared:
             fprintf(myJavaCode, "\t\tsipush %d\n",$7.val_int);
             fprintf(myJavaCode, "\t\tistore %d\n",w->index);
         }
-    }
+    }|
 
     LET MUT ID ':' standard_data_type '=' STR        
     {
@@ -897,11 +897,17 @@ simple_state:
 func_arg:
     expression ',' func_arg
     {
-        $$.arg_var_type = (char*)malloc(2*sizeof(char)); 
+        
+        int len = strlen($3.arg_var_type)+3;
+        
+        $$.arg_var_type = (char*)malloc(len*sizeof(char)); 
         sprintf($$.arg_var_type, "%d", $1.val_type);
         strcat($$.arg_var_type, ",");
         strcat($$.arg_var_type, $3.arg_var_type);
+        free( $3.arg_var_type);
+        
         Trace("expression ',' func_arg  reducing to func_arg\n");
+
     }|
     expression
     {
@@ -913,15 +919,18 @@ func_arg:
 func_invoke:
     ID  '(' func_arg ')' 
     {
+        
         strcpy(errWord ,"arg error");
         variableNode *v =  myTable.lookupFunc($$.name);
         if(v == NULL)
             yyerror(errWord);
 
+
         if(!myTable.func_type_check($1.name, $3.arg_var_type))
             yyerror(errWord);
         printf("sssssssssssssssss");
         char *ty;
+        
         if(v->val_Type == VAL_INT)
             ty = strdup("int");
         else if(v->val_Type == VAL_BOOL)
@@ -931,9 +940,11 @@ func_invoke:
         else if(v->val_Type == VAL_NULL)
             ty = strdup("void");
 
-        
-        fprintf(myJavaCode,"\t\tinvokestatic %s Project.%s(%s)\n", ty,v->name,myTable.func_type_combine(v));
+        char *combine = myTable.func_type_combine(v);
+        fprintf(myJavaCode,"\t\tinvokestatic %s Project.%s(%s)\n", ty,v->name,combine);
+        free(combine);
         Trace("ID  '(' func_arg ')' reducing to func_invoke\n");
+
     }|
     ID '(' ')'
     {
@@ -1285,6 +1296,7 @@ condition_else:
 condition:
     IF '(' bool_exp ')'
     {
+        
         labelStack[labelStackTop++] = labelNum;
         fprintf(myJavaCode,"\t\tifeq L%d\n", labelNum);
         labelNum += 2;        

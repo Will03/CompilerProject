@@ -1,21 +1,18 @@
-
-fn main() 
-{
-    let mut n = 1;
-    while (n <= 10) {
-        n = n + 1;
-        while (n <= 10) {
-            n = n + 1;
-        }
-        while (n <= 10) {
-            n = n + 1;
-            while (n <= 10) {
-                n = n + 1;
-            }
-        }
-    }
+// variables
+let mut c;
+let mut a = 5;
+// function declaration
+fn add(a:int, b:int) -> int {
+return a+b;
 }
-fn add2(cc:int,dd:bool)->int
-{
-
-}   
+// main function
+fn main() {
+c = add(a, 10);
+if (c > 10) {
+print -c;
+}
+else {
+print c;
+}
+println "Hello World";
+}

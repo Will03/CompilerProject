@@ -550,8 +550,8 @@ int symTable::func_type_check(char *name,char *argVar)
 }
 char *symTable::func_type_combine(variableNode *v)
 {
-    char *func_type_str = new char(100);
-    for(int i =0;i<100;i++)
+    char *func_type_str = new char(50);
+    for(int i =0;i<50;i++)
         func_type_str[i] = 0;
     for(int i =  0; i < v->argVar.size(); i++){
         
@@ -566,5 +566,6 @@ char *symTable::func_type_combine(variableNode *v)
         if(i < v->argVar.size()-1)
             strcat(func_type_str,",");
     }
+
     return(func_type_str);
 }

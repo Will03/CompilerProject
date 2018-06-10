@@ -1,24 +1,40 @@
 class Project
 {
-	method public static void add1(boolean, int, int)
-	max_stack 15
-	max_locals 15
-	{
-		iload 0
-		ireturn
-		return
-	}
 	method public static void main(java.lang.String[])
 	max_stack 15
 	max_locals 15
 	{
-		sipush 3
-		istore 0
-		iconst_1
+		sipush 0
+		istore 1
+		sipush 0
+		istore 2
+	L0:
+		iload 2
 		sipush 10
-		sipush 11
-		invokestatic void Project.add1(bool,int,int)
-		istore 0
+		isub
+		ifle L4
+		iconst_0
+		goto L5
+	L4:
+		iconst_1
+	L5:
+		ifeq L3
+		iload 1
+		iload 2
+		iadd
+		istore 1
+		iload 2
+		sipush 1
+		iadd
+		istore 2
+		goto L1
+	L3:
+		getstatic java.io.PrintStream java.lang.System.out
+		ldc "The sum is " 
+		invokevirtual void java.io.PrintStream.print(java.lang.String)
+		getstatic java.io.PrintStream java.lang.System.out
+		iload 1
+		invokevirtual void java.io.PrintStream.println(int)
 		return
 	}
 }
