@@ -6,29 +6,50 @@ class Project
 	{
 		sipush 0
 		istore 1
-		sipush 0
+		sipush 1
 		istore 2
+		sipush 1
+		istore 3
 	L0:
 		iload 2
 		sipush 10
 		isub
-		ifle L4
+		ifle L2
 		iconst_0
-		goto L5
-	L4:
+		goto L3
+	L2:
 		iconst_1
-	L5:
-		ifeq L3
+	L3:
+		ifeq L1
+		sipush 0
+		istore 3
+	L4:
+		iload 3
+		sipush 10
+		isub
+		ifle L6
+		iconst_0
+		goto L7
+	L6:
+		iconst_1
+	L7:
+		ifeq L5
 		iload 1
 		iload 2
 		iadd
 		istore 1
+		iload 3
+		sipush 1
+		iadd
+		istore 3
+		goto L4
+	L5:
 		iload 2
 		sipush 1
 		iadd
 		istore 2
-		goto L1
-	L3:
+		goto L0
+	L1:
 		getstatic java.io.PrintStream java.lang.System.out
 		ldc "The sum is " 
 		invokevirtual void java.io.PrintStream.print(java.lang.String)

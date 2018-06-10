@@ -1055,14 +1055,15 @@ expression:
     '(' expression ')'{$$ = $2;}|
     expression '*' expression
     {
+        printf("%d %d",$1.val_type , $3.val_type);
         strcpy(errWord,"type error");
         if($1.val_type != $3.val_type){
             yyerror(errWord);
         }
-        else 
-            yyerror(errWord);
         
         fprintf(myJavaCode, "\t\timul\n");
+        $$.val_type = $1.val_type;
+        $$.val_int = $1.val_int * $3.val_int;
     }|
     expression '/' expression
     {
@@ -1215,7 +1216,6 @@ bool_exp:
     }|
     bool_exp LESS_EQUAL bool_exp {
         strcpy(errWord,"tyep error"); 
-
         if($1.val_type != $3.val_type)
             yyerror(errWord);
         $$ = $1;
@@ -1307,14 +1307,14 @@ loop:
     {
         labelStack[labelStackTop++] = labelNum;
         fprintf(myJavaCode, "\tL%d:\n", labelNum);
-        labelNum += 4; 
+        labelNum += 2; 
     } '(' bool_exp ')'
     {
-            fprintf(myJavaCode,"\t\tifeq L%d\n", labelStack[labelStackTop-1] + 3);
+            fprintf(myJavaCode,"\t\tifeq L%d\n", labelStack[labelStackTop-1]+1);
     } block
     {
-        fprintf(myJavaCode,"\t\tgoto L%d\n", labelStack[labelStackTop-1] + 1);
-        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop] + 3);
+        fprintf(myJavaCode,"\t\tgoto L%d\n", labelStack[labelStackTop-1]);
+        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop] + 1);
     };
 
 %%

@@ -567,8 +567,8 @@ static const yytype_uint16 yyrline[] =
      606,   611,   618,   624,   633,   640,   640,   683,   683,   701,
      700,   758,   757,   788,   836,   866,   866,   875,   875,   884,
      889,   898,   912,   920,   949,   973,   977,   977,   985,  1051,
-    1052,  1053,  1054,  1055,  1056,  1067,  1099,  1122,  1143,  1154,
-    1155,  1156,  1166,  1176,  1185,  1201,  1216,  1231,  1247,  1262,
+    1052,  1053,  1054,  1055,  1056,  1068,  1100,  1123,  1144,  1155,
+    1156,  1157,  1167,  1177,  1186,  1202,  1217,  1231,  1247,  1262,
     1283,  1282,  1290,  1298,  1297,  1307,  1312,  1306
 };
 #endif
@@ -2698,20 +2698,21 @@ yyreduce:
   case 74:
 #line 1057 "FirstYacc.y" /* yacc.c:1646  */
     {
+        printf("%d %d",(yyvsp[-2].Data).val_type , (yyvsp[0].Data).val_type);
         strcpy(errWord,"type error");
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type){
             yyerror(errWord);
         }
-        else 
-            yyerror(errWord);
         
         fprintf(myJavaCode, "\t\timul\n");
+        (yyval.Data).val_type = (yyvsp[-2].Data).val_type;
+        (yyval.Data).val_int = (yyvsp[-2].Data).val_int * (yyvsp[0].Data).val_int;
     }
-#line 2711 "y.tab.c" /* yacc.c:1646  */
+#line 2712 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 1068 "FirstYacc.y" /* yacc.c:1646  */
+#line 1069 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
@@ -2743,11 +2744,11 @@ yyreduce:
         
         fprintf(myJavaCode, "\t\tidiv\n");
     }
-#line 2747 "y.tab.c" /* yacc.c:1646  */
+#line 2748 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 1100 "FirstYacc.y" /* yacc.c:1646  */
+#line 1101 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
@@ -2770,11 +2771,11 @@ yyreduce:
         
         fprintf(myJavaCode, "\t\tiadd\n");
     }
-#line 2774 "y.tab.c" /* yacc.c:1646  */
+#line 2775 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 1123 "FirstYacc.y" /* yacc.c:1646  */
+#line 1124 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"type error");
 
@@ -2795,11 +2796,11 @@ yyreduce:
         
         fprintf(myJavaCode, "\t\tisub\n");
     }
-#line 2799 "y.tab.c" /* yacc.c:1646  */
+#line 2800 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 1144 "FirstYacc.y" /* yacc.c:1646  */
+#line 1145 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
@@ -2807,17 +2808,17 @@ yyreduce:
         (yyval.Data) = (yyvsp[-2].Data);
         fprintf(myJavaCode, "\t\tirem\n");
     }
-#line 2811 "y.tab.c" /* yacc.c:1646  */
+#line 2812 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 1155 "FirstYacc.y" /* yacc.c:1646  */
+#line 1156 "FirstYacc.y" /* yacc.c:1646  */
     {(yyval.Data) = (yyvsp[0].Data);}
-#line 2817 "y.tab.c" /* yacc.c:1646  */
+#line 2818 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 1156 "FirstYacc.y" /* yacc.c:1646  */
+#line 1157 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
 
@@ -2828,11 +2829,11 @@ yyreduce:
         fprintf(myJavaCode, "\t\tiand\n");
 
     }
-#line 2832 "y.tab.c" /* yacc.c:1646  */
+#line 2833 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 1166 "FirstYacc.y" /* yacc.c:1646  */
+#line 1167 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
 
@@ -2843,11 +2844,11 @@ yyreduce:
         fprintf(myJavaCode, "\t\tior\n");
 
     }
-#line 2847 "y.tab.c" /* yacc.c:1646  */
+#line 2848 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 1176 "FirstYacc.y" /* yacc.c:1646  */
+#line 1177 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
 
@@ -2857,11 +2858,11 @@ yyreduce:
         (yyval.Data).val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tixor\n");
     }
-#line 2861 "y.tab.c" /* yacc.c:1646  */
+#line 2862 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 1185 "FirstYacc.y" /* yacc.c:1646  */
+#line 1186 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
 
@@ -2877,11 +2878,11 @@ yyreduce:
         fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
         labelNum +=2;
     }
-#line 2881 "y.tab.c" /* yacc.c:1646  */
+#line 2882 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 1201 "FirstYacc.y" /* yacc.c:1646  */
+#line 1202 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
 
@@ -2897,14 +2898,13 @@ yyreduce:
         fprintf(myJavaCode, "\tL%d:\n",labelNum+1);
         labelNum +=2;
     }
-#line 2901 "y.tab.c" /* yacc.c:1646  */
+#line 2902 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 1216 "FirstYacc.y" /* yacc.c:1646  */
+#line 1217 "FirstYacc.y" /* yacc.c:1646  */
     {
         strcpy(errWord,"tyep error"); 
-
         if((yyvsp[-2].Data).val_type != (yyvsp[0].Data).val_type)
             yyerror(errWord);
         (yyval.Data) = (yyvsp[-2].Data);
@@ -3022,7 +3022,7 @@ yyreduce:
     {
         labelStack[labelStackTop++] = labelNum;
         fprintf(myJavaCode, "\tL%d:\n", labelNum);
-        labelNum += 4; 
+        labelNum += 2; 
     }
 #line 3028 "y.tab.c" /* yacc.c:1646  */
     break;
@@ -3030,7 +3030,7 @@ yyreduce:
   case 96:
 #line 1312 "FirstYacc.y" /* yacc.c:1646  */
     {
-            fprintf(myJavaCode,"\t\tifeq L%d\n", labelStack[labelStackTop-1] + 3);
+            fprintf(myJavaCode,"\t\tifeq L%d\n", labelStack[labelStackTop-1]+1);
     }
 #line 3036 "y.tab.c" /* yacc.c:1646  */
     break;
@@ -3038,8 +3038,8 @@ yyreduce:
   case 97:
 #line 1315 "FirstYacc.y" /* yacc.c:1646  */
     {
-        fprintf(myJavaCode,"\t\tgoto L%d\n", labelStack[labelStackTop-1] + 1);
-        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop] + 3);
+        fprintf(myJavaCode,"\t\tgoto L%d\n", labelStack[labelStackTop-1]);
+        fprintf(myJavaCode, "\tL%d:\n", labelStack[--labelStackTop] + 1);
     }
 #line 3045 "y.tab.c" /* yacc.c:1646  */
     break;

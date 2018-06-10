@@ -7,11 +7,16 @@ fn main() {
   // variables
   let n = 10;
   let mut sum = 0;
-  let mut index = 0;
-    
+  let mut index:int = 1;
+  let mut index2:int = 1;
   while (index <= n) {
-    sum = sum + index;
-    index = index + 1;
+    index2 = 0;
+    while (index2 <= n) {
+      sum = sum + index;
+      index2 = index2 + 1;
+      
+  } 
+  index = index + 1;
   } 
   print "The sum is ";
   println sum;
