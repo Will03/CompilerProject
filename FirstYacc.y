@@ -158,7 +158,6 @@ constant_declared:
             {
                 yyerror(declareErr);
             }
-            constDeclar = 0;
         }
         else if($5.val_type == VAL_STR)
         {
@@ -188,6 +187,7 @@ constant_declared:
         else{
             yyerror(declareErr);
         }
+        constDeclar = 0;
         Trace("LET ID '=' standard_data_type reducing to constant_declared\n");
     }|
     LET ID ':' standard_data_type '='{constDeclar = 1;} expression         
@@ -236,7 +236,10 @@ constant_declared:
         else{
             yyerror(declareErr);
         }
+        constDeclar = 0;
         Trace("LET ID ':' standard_data_type '=' standard_data reducing to constant_declared\n");
+        
+
     };
 
 Variable_declared:
@@ -276,9 +279,9 @@ Variable_declared:
         }
         if(myTable.checkGlobal()){
             if($5.val_flag == false)
-                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 0);
+                fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, 0);
             else
-                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 1);
+                fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, 1);
         }
         else
         {
@@ -385,10 +388,10 @@ Variable_declared:
             printf("%d\n\n\n",$7.val_flag);
             if($7.val_flag == false)
             {
-                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 0);
+                fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, 0);
             }
             else{
-                fprintf(myJavaCode, "\tfield static bool %s = %d\n", $3.name, 1);
+                fprintf(myJavaCode, "\tfield static int %s = %d\n", $3.name, 1);
             }
                 
         }
@@ -431,6 +434,15 @@ Variable_declared:
             }
             if(myTable.checkGlobal())
                 fprintf(myJavaCode, "\tfield static int %s\n", $3.name);
+            else{
+                variableNode *w = myTable.lookupVar_for_index($3.name);
+                if(w == NULL)
+                {
+                    yyerror(declareErr);
+                }
+                fprintf(myJavaCode, "\t\tsipush 0\n");
+                fprintf(myJavaCode, "\t\tistore %d\n",w->index);
+            }
         }
         else if($5.val_type == VAL_STR)
         {
@@ -942,7 +954,7 @@ func_invoke:
 
         char *combine = myTable.func_type_combine(v);
         fprintf(myJavaCode,"\t\tinvokestatic %s Project.%s(%s)\n", ty,v->name,combine);
-        free(combine);
+        //free(combine);
         Trace("ID  '(' func_arg ')' reducing to func_invoke\n");
 
     }|
@@ -1028,9 +1040,9 @@ object:ID
                 if(v->val_Type == VAL_INT)
                     fprintf(myJavaCode,"\t\tgetstatic int Project.%s\n", $1.name);
                 else if(v->val_Type == VAL_BOOL)            
-                    fprintf(myJavaCode,"\t\tgetstatic bool Project.%s\n", $1.name);
+                    fprintf(myJavaCode,"\t\tgetstatic int Project.%s\n", $1.name);
                 else if(v->val_Type == VAL_FLOAT)
-                    fprintf(myJavaCode,"\t\tgetstatic float Project.%s\n", $1.name);
+                    fprintf(myJavaCode,"\t\tgetstatic int Project.%s\n", $1.name);
                 else if(v->val_Type == VAL_STR)
                     fprintf(myJavaCode,"\t\tgetstatic str Project.%s\n", $1.name);
             }
@@ -1072,29 +1084,11 @@ expression:
             yyerror(errWord);
         if($1.val_type != VAL_INT && $1.val_type != VAL_FLOAT)
             yyerror(errWord);
-        if($1.val_type == VAL_INT)
-        {
-            if($3.val_int == 0)
-            {
-                strcpy(errWord,"divide 0");
-                yyerror(errWord);
-            }
-            $$.val_type = $1.val_type;
-            $$.val_int = $1.val_int / $3.val_int;
-        }
-        else if($1.val_type == VAL_FLOAT)
-        {
-            if($3.val_float == 0)
-            {
-                strcpy(errWord,"divide 0");
-                yyerror(errWord);
-            }
-            $$.val_type = $1.val_type;
-            $$.val_float = $1.val_float / $3.val_float;
-        }
-        else 
-            yyerror(errWord);
+
+    
         
+        $$.val_type = $1.val_type;
+        $$.val_int = 0;
         fprintf(myJavaCode, "\t\tidiv\n");
     }|
     expression '+' expression
@@ -1143,9 +1137,7 @@ expression:
     }|
     expression '%' expression
     {
-        strcpy(errWord,"tyep error"); 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+        
         $$ = $1;
         fprintf(myJavaCode, "\t\tirem\n");
     };
@@ -1157,18 +1149,16 @@ bool_exp:
     bool_exp AND_DOUBLE bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tiand\n");
-
+        printf("gogogog");
     }| 
     bool_exp OR_DOUBLE bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tior\n");
@@ -1177,8 +1167,7 @@ bool_exp:
     bool_exp '!' bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tixor\n");
@@ -1186,8 +1175,7 @@ bool_exp:
     bool_exp '<' bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tisub\n");
@@ -1202,8 +1190,7 @@ bool_exp:
     bool_exp '>' bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tisub\n");
@@ -1216,8 +1203,7 @@ bool_exp:
     }|
     bool_exp LESS_EQUAL bool_exp {
         strcpy(errWord,"tyep error"); 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tisub\n");
@@ -1231,8 +1217,7 @@ bool_exp:
     bool_exp GREAT_EQUAL bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tisub\n");
@@ -1247,8 +1232,7 @@ bool_exp:
     bool_exp EQUAL bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tisub\n");
@@ -1262,8 +1246,7 @@ bool_exp:
     bool_exp NOT_EQUAL bool_exp {
         strcpy(errWord,"tyep error"); 
 
-        if($1.val_type != $3.val_type)
-            yyerror(errWord);
+
         $$ = $1;
         $$.val_type = VAL_BOOL;
         fprintf(myJavaCode, "\t\tisub\n");

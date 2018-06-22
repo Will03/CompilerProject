@@ -1,0 +1,12 @@
+parser:
+	- 更改運算方式不再由parser處理
+	- 沒有float
+	- boolean 和 int 不能做計算
+	- 更改每個grammer讓他能夠將正確的組合語言存入Project.jasm中
+	- 在java的環境中執行
+
+
+執行方式：
+./a.out < ???.rust
+./javaaPortable/javaa ./Will.jasm 
+java Project

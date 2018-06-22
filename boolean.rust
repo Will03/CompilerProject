@@ -1,17 +1,29 @@
 // variables
-let mut c;
-let mut a = 5;
 // function declaration
 fn add(a:int, b:int) -> int {
 return a+b;
 }
 // main function
 fn main() {
-    c = add(a, 10);
-    if (c > 10) {
-    println -c;
-        if (c > 10) {
-            println "fuck";
+    let mut gg = true;
+    let mut a = 5;
+    let mut c;
+    gg = false;
+    let x = "book";
+    c =  add(a, 10);
+    c=11;
+    if (c == 10) {
+    println c;
+        if (c >= 10) {
+            while(c >= 1)
+            {
+                println c;
+                c = c-1;
+            }
+        }
+        else 
+        {
+        print c;
         }
     }
     else 

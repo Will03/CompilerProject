@@ -534,7 +534,6 @@ int symTable::func_type_check(char *name,char *argVar)
 
     if(newArg.size()!= v->argVar.size())
         return 0;
-    printf("%d %d",newArg.size(),v->argVar.size());
     for(int i =0;i < v->argVar.size();i++)
     {
         printf("%d %d",v->argVar[i].val_Type,newArg[i]);
